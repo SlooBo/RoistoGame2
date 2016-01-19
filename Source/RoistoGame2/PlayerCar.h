@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include "CarMovementComponent.h"
 #include "PlayerCar.generated.h"
 
 UCLASS()
@@ -23,6 +24,14 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
-	
+	virtual UPawnMovementComponent* GetMovementComponent() const override;
+
+	//MovementControls
+	void MoveForward(float AxisValue);
+	void Turn(float AxisValue);
+
+
+	class UCarMovementComponent* MyMovementComponent;
 };
