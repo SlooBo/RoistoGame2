@@ -23,8 +23,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	virtual UPawnMovementComponent* GetMovementComponent() const override;
 
@@ -32,6 +30,8 @@ public:
 	void MoveForward(float AxisValue);
 	void Turn(float AxisValue);
 
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UStaticMeshComponent* CarMesh;
 
 	class UCarMovementComponent* MyMovementComponent;
 };

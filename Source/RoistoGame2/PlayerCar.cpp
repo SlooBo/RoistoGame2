@@ -10,20 +10,37 @@ APlayerCar::APlayerCar(const class FObjectInitializer& ObjectInitializer) : Supe
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Root component is box because car
 	UBoxComponent* BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
 	RootComponent = BoxComponent;
-	//TODO: Box collision presets
+	BoxComponent->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
+	BoxComponent->SetVisibility(true);
 
+	//TODO: Box collision presets
+	BoxComponent->SetCollisionProfileName(TEXT("Pawn"));
 	//Dont set mesh in code
 	UStaticMeshComponent* CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarMesh"));
 	CarMesh->AttachTo(RootComponent);
+	UStaticMesh* meshToUse = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),
+		NULL, TEXT("Content/Models/Traps/Sirkel/sirkels.uasset")));
+	if (CarMesh && meshToUse)
+	{
+		CarMesh->SetStaticMesh(meshToUse);
+	}
+	//TODO: Find a proper way to set mesh
 	
 	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
+	//TODO: Adjust values
 	SpringArm->AttachTo(RootComponent);
+	SpringArm->RelativeRotation = FRotator(-40.f, 0.f, 0.f);
+	SpringArm->TargetArmLength = 400.0f;
+	SpringArm->bEnableCameraLag = true;
+	SpringArm->CameraLagSpeed = 3.0f;
 
 	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->AttachTo(SpringArm, USpringArmComponent::SocketName);
 
+	// Create an instance of our movement component, and tell it to update our root component.
 	MyMovementComponent = CreateDefaultSubobject<UCarMovementComponent>(TEXT("CustomMovementComponetn"));
 	MyMovementComponent->UpdatedComponent = RootComponent;
 }
@@ -47,35 +64,11 @@ void APlayerCar::SetupPlayerInputComponent(class UInputComponent* InputComponent
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
+	//InputComponent->BindAction("Shoot",IE_Pressed,this,&APlayerCar::);
+
 	InputComponent->BindAxis("MoveForward", this, &APlayerCar::MoveForward);
-	InputComponent->BindAxis("Turn", this, &APlayerCar::Turn);
+	InputComponent->BindAxis("TurnRight", this, &APlayerCar::Turn);
 
-}
-
-void APlayerCar::TickComponent(fkiat DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// Make sure that everything is still valid, and that we are allowed to move.
-	if (!PawnOwner || !UpdatedComponent || ShouldSkipUpdate(DeltaTime))
-	{
-		return;
-	}
-
-	// Get (and then clear) the movement vector that we set in ACollidingPawn::Tick
-	//150(Unreal Units) is hard coded max speed apparently
-	FVector DesiredMovementThisFrame = ConsumeInputVector().GetClampedToMaxSize(1.0f) * DeltaTime * 150.0f;
-	if (!DesiredMovementThisFrame.IsNearlyZero())
-	{
-		FHitResult Hit;
-		SafeMoveUpdatedComponent(DesiredMovementThisFrame, UpdatedComponent->GetComponentRotation(), true, Hit);
-
-		// If we bumped into something, try to slide along it
-		if (Hit.IsValidBlockingHit())
-		{
-			SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);
-		}
-	}
 }
 
 UPawnMovementComponent* APlayerCar::GetMovementComponent() const
@@ -94,7 +87,6 @@ void APlayerCar::MoveForward(float AxisValue)
 void APlayerCar::Turn(float AxisValue)
 {
 	FRotator NewRotation = GetActorRotation();
-	NewRotation.yaw += AxisValue;
+	NewRotation.Yaw += AxisValue;
 	SetActorRotation(NewRotation);
-
 }
