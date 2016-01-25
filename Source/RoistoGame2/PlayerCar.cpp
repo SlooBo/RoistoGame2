@@ -19,23 +19,26 @@ APlayerCar::APlayerCar(const class FObjectInitializer& ObjectInitializer) : Supe
 	//TODO: Box collision presets
 	BoxComponent->SetCollisionProfileName(TEXT("Pawn"));
 	//Dont set mesh in code
-	UStaticMeshComponent* CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarMesh"));
+	CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarMesh"));
 	CarMesh->AttachTo(RootComponent);
 	UStaticMesh* meshToUse = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),
-		NULL, TEXT("Content/Models/Traps/Sirkel/sirkels.uasset")));
+		NULL, TEXT("StaticMesh'/Game/Models/Bullets/nuclearBomb.nuclearBomb'")));
 	if (CarMesh && meshToUse)
 	{
 		CarMesh->SetStaticMesh(meshToUse);
 	}
 	//TODO: Find a proper way to set mesh
 	
+
+
+
 	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
 	//TODO: Adjust values
 	SpringArm->AttachTo(RootComponent);
-	SpringArm->RelativeRotation = FRotator(-40.f, 0.f, 0.f);
-	SpringArm->TargetArmLength = 400.0f;
+	SpringArm->RelativeRotation = FRotator(-20.f, 0.f, 0.f);
+	SpringArm->TargetArmLength = 250.0f;
 	SpringArm->bEnableCameraLag = true;
-	SpringArm->CameraLagSpeed = 3.0f;
+	SpringArm->CameraLagSpeed = 2.0f;
 
 	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->AttachTo(SpringArm, USpringArmComponent::SocketName);

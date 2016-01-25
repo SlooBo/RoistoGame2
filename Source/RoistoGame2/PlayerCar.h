@@ -33,5 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 	UStaticMeshComponent* CarMesh;
 
+	UStaticMeshComponent* WheelMesh;
+
 	class UCarMovementComponent* MyMovementComponent;
 };
