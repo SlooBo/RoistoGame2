@@ -2,6 +2,8 @@
 
 #pragma once
 
+#define STRINGIFY(str) L#str
+
 /**
  * 
  */
@@ -14,4 +16,5 @@ public:
 	static class APlayerCar* GetLocalPlayer(UWorld* world);
 	static class APlayerCar* GetPlayerCar(APlayerController* player);
 	static int32 GetNumPlayers(UWorld* world);
+
 };

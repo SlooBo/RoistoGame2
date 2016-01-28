@@ -4,6 +4,7 @@
 
 #include "GameFramework/Pawn.h"
 #include "CarMovementComponent.h"
+#include "MyPlayerController.h"
 #include "PlayerCar.generated.h"
 
 UCLASS()
