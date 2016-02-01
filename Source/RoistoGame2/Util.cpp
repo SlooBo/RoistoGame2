@@ -31,3 +31,14 @@ int32 Util::GetNumPlayers(UWorld* world)
 
 	return numPlayers;
 }
+
+float Util::GetDistanceToPlayer(const AActor* object, const APlayerCar* player)
+{
+	FVector objectLoc = object->GetActorLocation();
+	FVector playerLoc = player->GetActorLocation();
+	FVector diff = objectLoc - playerLoc;
+
+	UCapsuleComponent* capsule = nullptr;
+
+
+}
