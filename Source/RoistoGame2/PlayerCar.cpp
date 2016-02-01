@@ -11,13 +11,13 @@ APlayerCar::APlayerCar(const class FObjectInitializer& ObjectInitializer) : Supe
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Root component is box because car
-	UBoxComponent* BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
-	RootComponent = BoxComponent;
-	BoxComponent->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
-	BoxComponent->SetVisibility(true);
+	MyHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
+	RootComponent = MyHitBox;
+	MyHitBox->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
+	MyHitBox->SetVisibility(true);
 
 	//TODO: Box collision presets
-	BoxComponent->SetCollisionProfileName(TEXT("Pawn"));
+	MyHitBox->SetCollisionProfileName(TEXT("Pawn"));
 	//Dont set mesh in code
 	CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarMesh"));
 	CarMesh->AttachTo(RootComponent);
@@ -77,6 +77,11 @@ void APlayerCar::SetupPlayerInputComponent(class UInputComponent* InputComponent
 UPawnMovementComponent* APlayerCar::GetMovementComponent() const
 {
 	return MyMovementComponent;
+}
+
+UBoxComponent APlayerCar::GetHitBox()
+{
+	return MyHitBox;
 }
 
 void APlayerCar::MoveForward(float AxisValue)

@@ -39,6 +39,16 @@ float Util::GetDistanceToPlayer(const AActor* object, const APlayerCar* player)
 	FVector diff = objectLoc - playerLoc;
 
 	UCapsuleComponent* capsule = nullptr;
+	UBoxComponent* box = player->getHitBox();
+	if (capsule == NULL)
+		return diff.Size();
 
+	float diagonal;
+	FBoxSphereBounds bounds = box->Bounds;
+	float radius = bounds.SphereRadius;
 
+	float objectRadius = 0.0f;
+	
+
+	return 0.0f;
 }
