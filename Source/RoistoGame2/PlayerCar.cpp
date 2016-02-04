@@ -79,10 +79,10 @@ UPawnMovementComponent* APlayerCar::GetMovementComponent() const
 	return MyMovementComponent;
 }
 
-UBoxComponent APlayerCar::GetHitBox()
-{
-	return MyHitBox;
-}
+//UBoxComponent* APlayerCar::getHitBox()
+//{
+//	return  MyHitBox;
+//}
 
 void APlayerCar::MoveForward(float AxisValue)
 {

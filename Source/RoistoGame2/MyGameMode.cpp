@@ -3,6 +3,7 @@
 #include "RoistoGame2.h"
 #include "MyGameMode.h"
 #include "PlayerCar.h"
+#include "MyPlayerState.h"
 #include "Util.h"
 #include "MyPlayerController.h"
 
@@ -21,12 +22,12 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(ob
 		HUDClass = (UClass*)PlayerHud.Object->GeneratedClass;*/
 	
 	//PlayerControllerClass = AMyPlayerController::StaticClass();
-	/*PlayerStateClass = 
+	/*PlayerStateClass = AMyPlayerState::StaticClass();
 	SpectatorClass =
 	GhostCharacterClass =
 	GameStateClass =*/
 	
-	//DefaultPlayerName = FText::FromString("FastCar");
+	DefaultPlayerName = FText::FromString("FastCar");
 
 	//TODO: Check true functioning behind this
 	bDelayedStart = true;
@@ -50,6 +51,68 @@ FString AMyGameMode::GetInGameStateAsString(InGameState state)
 	return enumptr->GetEnumName((uint8)state);
 }
 
+void AMyGameMode::StartNewPlayer(APlayerController* newPlayer)
+{
+	SetupNewPlayer(newPlayer);
+
+	Super::StartNewPlayer(newPlayer);
+}
+
+void AMyGameMode::Logout(AController* exiting)
+{
+	AMyPlayerController* pc = Cast<AMyPlayerController>(exiting);
+
+	// remove ongoing respawn timers if player disconnects
+	if (pc != NULL && respawnTimerList.Contains(pc))
+	GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[pc]);
+
+	Super::Logout(exiting);
+}
+
+//TODO:Check if this needed
+//void AMyGameMode::HandleMatchIsWaitingToStart()
+//{
+//	Super::HandleMatchIsWaitingToStart();
+//
+//	inGameState = InGameState::WarmupStarting;
+//
+//	waitElapsed = -1;
+//	GetWorld()->GetTimerManager().SetTimer(waitTimer, this, &AMyGameMode::WaitTickSecond, 1.0f, true, 0.0f);
+//}
+
+void AMyGameMode::StartMatch()
+{
+	//if (inGameState != InGameState::Warmup)
+		MatchState = MatchState::WaitingToStart;
+
+	Super::StartMatch();
+
+	//if (inGameState == InGameState::Warmup)
+	//{
+	//	OnWarmupStart();
+	//	return;
+	//}
+
+	//GetWorld()->GetTimerManager().ClearTimer(waitTimer);
+
+	// match needs restarting, move players back to spawn
+	for (auto iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
+	{
+		if ((*iter)->GetPawn() != NULL)
+			(*iter)->GetPawn()->Reset();
+
+		AMyPlayerState* playerState = Cast<AMyPlayerState>((*iter)->PlayerState);
+		if (playerState != NULL)
+			playerState->ResetStats();
+
+		RespawnPlayer(*iter);
+	}
+
+	mapTimeElapsed = 0;
+	GetWorld()->GetTimerManager().SetTimer(mapTimerHandle, this, &AMyGameMode::MapTickSecond, 1.0f, true);
+
+	OnMatchStart();
+}
 bool AMyGameMode::ShouldSpawnAtStartSpot(AController* player)
 {
 	//TODO: Check what relation this has with controller location
@@ -83,15 +146,39 @@ AActor* AMyGameMode::ChoosePlayerStart_Implementation(AController* player)
 	return spawnLocation;
 }
 
-//void AMyGameMode::OnMatchStart_Implementation()
-//{
-//	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
-//	{
-//		SetupNewPlayer(*iter);
-//		//TODO!!!:MyPlayerController
-//		(*iter)->OnMatchStart();
-//	}
-//}
+void AMyGameMode::WaitTickSecond()
+{
+	
+}
+
+void AMyGameMode::MapTickSecond()
+{
+	mapTimeElapsed++;
+
+	if (mapTimelimit > 0 && inGameState != InGameState::Starting)
+	{
+		if (mapTimeElapsed >= mapTimelimit)
+		{
+			mapTimeElapsed = 0;
+			//OnMapTimeout();
+		}
+		else
+		{
+			//TODO: notify players to display timeleft messages?
+		}
+	}
+	//UpdateGameState();
+}
+
+void AMyGameMode::OnMatchStart_Implementation()
+{
+	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
+	{
+		SetupNewPlayer(*iter);
+		//TODO!!!:MyPlayerController
+		(*iter)->OnMatchStart();
+	}
+}
 
 void AMyGameMode::SetupNewPlayer(APlayerController* newPlayer)
 {
@@ -105,87 +192,24 @@ void AMyGameMode::SetupNewPlayer(APlayerController* newPlayer)
 	}*/
 }
 
-//void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
-//{
-//	if (player == NULL)
-//		return;
-//
-//	if (respawnDelay <= 0.0f)
-//	{
-//		//RestartPlayer(player);
-//		return;
-//	}
-//
-//	if (!respawnTimerList.Contains(player))
-//	{
-//		FTimerHandle timerHandle;
-//		respawnTimerList.Add(player, timerHandle);
-//	}
-//
-//	//From different project;Might not be needed in this game
-//	//FTimerDelegate respawnDelegate = FTimerDelegate::CreateUObject<ACMGameMode, AController*>(this, &ACMGameMode::RestartPlayer, player);
-//	//GetWorld()->GetTimerManager().SetTimer(respawnTimerList[player], respawnDelegate, respawnDelay, false);
-//}
-
-void AMyGameMode::StartNewPlayer(APlayerController* newPlayer)
+void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
 {
-	SetupNewPlayer(newPlayer);
+	if (player == NULL)
+		return;
 
-	Super::StartNewPlayer(newPlayer);
-}
+	if (respawnDelay <= 0.0f)
+	{
+		//RestartPlayer(player);
+		return;
+	}
 
-void AMyGameMode::Logout(AController* exiting)
-{
-	AMyPlayerController* pc = Cast<AMyPlayerController>(exiting);
+	if (!respawnTimerList.Contains(player))
+	{
+		FTimerHandle timerHandle;
+		respawnTimerList.Add(player, timerHandle);
+	}
 
-	// remove ongoing respawn timers if player disconnects
-	if (pc != NULL && respawnTimerList.Contains(pc))
-	GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[pc]);
-
-	Super::Logout(exiting);
-}
-
-//TODO:Check
-void AMyGameMode::HandleMatchIsWaitingToStart()
-{
-	//Super::HandleMatchIsWaitingToStart();
-
-	//inGameState = InGameState::WarmupStarting;
-
-	////waitElapsed = -1;
-	//GetWorld()->GetTimerManager().SetTimer(waitTimer, this, &AMyGameMode::WaitTickSecond, 1.0f, true, 0.0f);
-}
-
-void AMyGameMode::StartMatch()
-{
-	//if (inGameState != InGameState::Warmup)
-	//	MatchState = MatchState::WaitingToStart;
-
-	//Super::StartMatch();
-
-	//if (inGameState == InGameState::Warmup)
-	//{
-	//	OnWarmupStart();
-	//	return;
-	//}
-
-	//GetWorld()->GetTimerManager().ClearTimer(waitTimer);
-
-	//// match needs restarting, move players back to spawn
-	//for (auto iter = GetWorld()->GetPlayerControllerIterator(); iter; ++iter)
-	//{
-	//	if ((*iter)->GetPawn() != NULL)
-	//		(*iter)->GetPawn()->Reset();
-
-	//	ACMPlayerState* playerState = Cast<ACMPlayerState>((*iter)->PlayerState);
-	//	if (playerState != NULL)
-	//		playerState->ResetStats();
-
-	//	RespawnPlayer(*iter);
-	//}
-
-	//mapTimeElapsed = 0;
-	//GetWorld()->GetTimerManager().SetTimer(mapTimerHandle, this, &ACMGameMode::MapTickSecond, 1.0f, true);
-
-	//OnMatchStart();
+	//From different project;Might not be needed in this game
+	//FTimerDelegate respawnDelegate = FTimerDelegate::CreateUObject<ACMGameMode, AController*>(this, &ACMGameMode::RestartPlayer, player);
+	//GetWorld()->GetTimerManager().SetTimer(respawnTimerList[player], respawnDelegate, respawnDelay, false);
 }

@@ -32,23 +32,25 @@ int32 Util::GetNumPlayers(UWorld* world)
 	return numPlayers;
 }
 
+//TODO: Check if this function is even needed
+//TODO: If needed fix this
 float Util::GetDistanceToPlayer(const AActor* object, const APlayerCar* player)
 {
 	FVector objectLoc = object->GetActorLocation();
 	FVector playerLoc = player->GetActorLocation();
 	FVector diff = objectLoc - playerLoc;
 
-	UCapsuleComponent* capsule = nullptr;
-	UBoxComponent* box = player->getHitBox();
-	if (capsule == NULL)
+	/*UCapsuleComponent* capsule = nullptr;
+	UBoxComponent* box = player->getHitBox();*/
+	//if (capsule == NULL)
 		return diff.Size();
 
-	float diagonal;
-	FBoxSphereBounds bounds = box->Bounds;
-	float radius = bounds.SphereRadius;
+	//float diagonal;
+	//FBoxSphereBounds bounds = box->Bounds;
+	//float radius = bounds.SphereRadius;
 
-	float objectRadius = 0.0f;
-	
+	//float objectRadius = 0.0f;
+	//
 
-	return 0.0f;
+	//return 0.0f;
 }

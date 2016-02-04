@@ -43,7 +43,7 @@ public:
 	//Overrides
 	virtual void StartNewPlayer(APlayerController* newPlayer) override;
 	virtual void Logout(AController* exiting) override;
-	virtual void HandleMatchIsWaitingToStart() override;
+	//virtual void HandleMatchIsWaitingToStart() override;
 	virtual void StartMatch() override;
 
 	virtual bool ShouldSpawnAtStartSpot(AController* player) override;
@@ -53,7 +53,7 @@ public:
 
 	//virtual void UpdateGameState();
 
-	void WaitTickeSecond();
+	void WaitTickSecond();
 	void MapTickSecond();
 
 	/*UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Left"), Category = "Gameplay|Level")
@@ -69,12 +69,12 @@ public:
 
 	//Respawns player
 	//UFUNCTION(BlueprintCallable, Meta = (Displayname = "Respawn Player"), Category = "Gameplay|Player")
-	//void RespawnPlayer(APlayerController* player, float respawnDelay = 0.0f);
+	void RespawnPlayer(APlayerController* player, float respawnDelay = 0.0f);
 
-	////Event when match has started
-	//UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Match Start"), Category = "Gameplay")
-	//void OnMatchStart();
-	//virtual void OnMatchStart_Implementation();
+	//Event when match has started
+	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Match Start"), Category = "Gameplay")
+	void OnMatchStart();
+	virtual void OnMatchStart_Implementation();
 
 
 	virtual void SetupNewPlayer(APlayerController* newPlayer);
@@ -89,7 +89,7 @@ public:
 	//void OnPlayerRespawn(AMyPlayerController* player);
 	//virtual void OnPlayerRespawn_Implementation(AMyPlayerController* player);
 
-	//int32 GetPlayerMaxMoney() { return playerMaxMoney; };
+	int32 GetPlayerMaxMoney() { return playerMaxMoney; };
 
 protected:
 

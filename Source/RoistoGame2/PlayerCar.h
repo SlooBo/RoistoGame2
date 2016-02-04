@@ -36,7 +36,7 @@ public:
 
 	UStaticMeshComponent* WheelMesh;
 
-	const UBoxComponent* getHitBox();
+	//const UBoxComponent* getHitBox();
 
 protected:
 

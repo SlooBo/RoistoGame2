@@ -14,8 +14,19 @@ class ROISTOGAME2_API AMyPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	/*UFUNCTION(Reliable, Client)
-	void OnMatchStart();*/
+
+	AMyPlayerController(const class FObjectInitializer& objectInitializer);
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(Reliable, Client)
+	void OnMatchStart();
 	
 protected:
+
+	UPROPERTY(REPLICATED)
+	bool canBuild;
+
+	UPROPERTY(REPLICATED)
+	bool isBuilding;
 };
