@@ -146,6 +146,60 @@ AActor* AMyGameMode::ChoosePlayerStart_Implementation(AController* player)
 	return spawnLocation;
 }
 
+void AMyGameMode::SetPlayerDefaults(APawn* playerPawn)
+{
+	APlayerCar* playerCar = Cast<APlayerCar>(playerPawn);
+	if (playerCar == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: SetPlayerDefaults player pawn is not PlayerCharacter"));
+		return;
+	}
+
+	//setup character here
+	AMyPlayerController* player = Cast<AMyPlayerController>(playerCar->GetController());
+	if (player == NULL)
+		return;
+
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(player->PlayerState);
+	if (playerState == NULL)
+		return;
+
+
+	playerState->SetAlive(true);
+}
+
+void AMyGameMode::RestartPlayer(AController* controller)
+{
+	AMyPlayerController* player = Cast<AMyPlayerController>(controller->CastToPlayerController());
+	if (player == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: RestartPlayer, controller is not MyPlayerController"));
+		return;
+	}
+
+	//// clear respawn timers if player respawned early
+	//if (respawnTimerList.Contains(player))
+	//	GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[player]);
+
+	if (player->PlayerState == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: RestartPlayer, PlayerState is null (player disconnected?)"));
+		return;
+	}
+
+	//TODO: Check this part!
+	APlayerCar* playerCar = Cast<APlayerCar>(player->GetPawn());
+	//TODO: add here buildPawn???
+	if (playerCar != NULL)
+	{
+		//do nothing if player is already driving
+		return;
+	}
+
+	//create and place player pawn
+	AActor* startPos = FindPlayerStart(player);
+}
+
 void AMyGameMode::WaitTickSecond()
 {
 	
