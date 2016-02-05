@@ -8,6 +8,8 @@
 UENUM(BlueprintType)
 enum class InGameState : uint8
 {
+	WarmupStarting,
+	Warmup,
 	Starting,
 	Running,
 	End,
@@ -21,10 +23,10 @@ enum class RespawnMode : uint8
 	AtSpawnPoint = 0,
 
 	// Player may spawn at ghost location
-	AtGhost,
+	AtBuilder,
 
 	// Player may spawn at ghost location, but is placed to random spawn point after death
-	AtGhostNearSpawn,
+	AtBuilderNearSpawn,
 };
 /**
  * 
@@ -43,7 +45,7 @@ public:
 	//Overrides
 	virtual void StartNewPlayer(APlayerController* newPlayer) override;
 	virtual void Logout(AController* exiting) override;
-	//virtual void HandleMatchIsWaitingToStart() override;
+	virtual void HandleMatchIsWaitingToStart() override;
 	virtual void StartMatch() override;
 
 	virtual bool ShouldSpawnAtStartSpot(AController* player) override;
@@ -56,19 +58,19 @@ public:
 	void WaitTickSecond();
 	void MapTickSecond();
 
-	/*UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Left"), Category = "Gameplay|Level")
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Left"), Category = "Gameplay|Level")
 	int32 MapTimeleft();
 
 	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Elapsed"), Category = "Gameplay|Level")
-	int32 MapTimeElapsed();*/
+	int32 MapTimeElapsed();
 
 	////Returns bool can player respawn
 	//virtual bool CanPlayerRespawn(APlayerController* player);
-	////Changes player to be able to respawn
-	//void AllowPlayerRespawn(APlayerController* player);
+	//Changes player to be able to respawn
+	void AllowPlayerRespawn(APlayerController* player);
 
 	//Respawns player
-	//UFUNCTION(BlueprintCallable, Meta = (Displayname = "Respawn Player"), Category = "Gameplay|Player")
+	UFUNCTION(BlueprintCallable, Meta = (Displayname = "Respawn Player"), Category = "Gameplay|Player")
 	void RespawnPlayer(APlayerController* player, float respawnDelay = 0.0f);
 
 	//Event when match has started
@@ -84,10 +86,15 @@ public:
 	//void OnPlayerDeath(AMyPlayerController* player, AMyPlayerController* killer = NULL);
 	//virtual void OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer = NULL);
 
-	//UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Respawn"), Category = "Gameplay|Player")
-	//// Event when player respawns
-	//void OnPlayerRespawn(AMyPlayerController* player);
-	//virtual void OnPlayerRespawn_Implementation(AMyPlayerController* player);
+	// Event when player respawns
+	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Respawn"), Category = "Gameplay|Player")
+	void OnPlayerRespawn(AMyPlayerController* player);
+	virtual void OnPlayerRespawn_Implementation(AMyPlayerController* player);
+
+	// Event when warmup has started
+	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Warmup Start"), Category = "Gameplay")
+	void OnWarmupStart();
+	virtual void OnWarmupStart_Implementation();
 
 	int32 GetPlayerMaxMoney() { return playerMaxMoney; };
 
@@ -101,6 +108,7 @@ protected:
 	int32 mapTimelimit;
 
 	int32 mapTimeElapsed;
+	int32 waitElapsed;
 
 	FTimerHandle mapTimerHandle;	// Ticks once every second when the main game mode is running
 	FTimerHandle waitTimer;			// Wait for players timer before game starts

@@ -70,28 +70,28 @@ void AMyGameMode::Logout(AController* exiting)
 }
 
 //TODO:Check if this needed
-//void AMyGameMode::HandleMatchIsWaitingToStart()
-//{
-//	Super::HandleMatchIsWaitingToStart();
-//
-//	inGameState = InGameState::WarmupStarting;
-//
-//	waitElapsed = -1;
-//	GetWorld()->GetTimerManager().SetTimer(waitTimer, this, &AMyGameMode::WaitTickSecond, 1.0f, true, 0.0f);
-//}
+void AMyGameMode::HandleMatchIsWaitingToStart()
+{
+	Super::HandleMatchIsWaitingToStart();
+
+	inGameState = InGameState::WarmupStarting;
+
+	waitElapsed = -1;
+	GetWorld()->GetTimerManager().SetTimer(waitTimer, this, &AMyGameMode::WaitTickSecond, 1.0f, true, 0.0f);
+}
 
 void AMyGameMode::StartMatch()
 {
-	//if (inGameState != InGameState::Warmup)
+	if (inGameState != InGameState::Warmup)
 		MatchState = MatchState::WaitingToStart;
 
 	Super::StartMatch();
 
-	//if (inGameState == InGameState::Warmup)
-	//{
-	//	OnWarmupStart();
-	//	return;
-	//}
+	if (inGameState == InGameState::Warmup)
+	{
+		OnWarmupStart();
+		return;
+	}
 
 	//GetWorld()->GetTimerManager().ClearTimer(waitTimer);
 
@@ -125,7 +125,7 @@ AActor* AMyGameMode::ChoosePlayerStart_Implementation(AController* player)
 {
 	AActor* spawnLocation = NULL;
 
-	if (respawnMode == RespawnMode::AtGhost)
+	if (respawnMode == RespawnMode::AtBuilder)
 	{
 		APlayerController* playerController = player->CastToPlayerController();
 		if (playerController != NULL)
@@ -198,11 +198,60 @@ void AMyGameMode::RestartPlayer(AController* controller)
 
 	//create and place player pawn
 	AActor* startPos = FindPlayerStart(player);
+	APawn* newPawn = SpawnDefaultPawnFor(player, startPos);
+	if (newPawn == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: SetPlayerDefaults player pawn is not PlayerCharacter"));
+		//SpectatePlayer(player);
+		return;
+	}
+
+	/*if (buildCharacter != NULL)
+	{
+		buildCharacter->SetActorHiddenInGame(true);
+		buildCharacter->SetActorEnableCollision(false);
+		buildCharacter->SetActorTickEnabled(false);
+	}*/
+
+	//check if this line is needed
+	player->PlayerState->bIsSpectator = false;
+	player->ChangeState(NAME_Playing);
+	player->ClientGotoState(NAME_Playing);
+
+	FRotator NewControllerRot = startPos->GetActorRotation();
+	NewControllerRot.Roll = 0.f;
+	/*if (buildCharacter != NULL)
+		NewControllerRot.Pitch = buildCharacter->GetControlRotation().Pitch;*/
+
+	player->UnPossess();
+	player->SetPawn(newPawn);
+	player->Possess(newPawn);
+
+	player->SetControlRotation(NewControllerRot);
+	
+	SetPlayerDefaults(newPawn);
+
+	/*if (buildCharacter != NULL)
+		buildCharacter->Destroy();*/
+
+	AllowPlayerRespawn(player);
+
+	OnPlayerRespawn(player);
 }
 
 void AMyGameMode::WaitTickSecond()
 {
 	
+}
+
+int32 AMyGameMode::MapTimeleft()
+{
+	return (mapTimelimit > 0) ? (mapTimelimit - mapTimeElapsed) : 0;
+}
+
+int32 AMyGameMode::MapTimeElapsed()
+{
+	return mapTimeElapsed;
 }
 
 void AMyGameMode::MapTickSecond()
@@ -224,26 +273,10 @@ void AMyGameMode::MapTickSecond()
 	//UpdateGameState();
 }
 
-void AMyGameMode::OnMatchStart_Implementation()
+void AMyGameMode::AllowPlayerRespawn(APlayerController* player)
 {
-	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
-	{
-		SetupNewPlayer(*iter);
-		//TODO!!!:MyPlayerController
-		(*iter)->OnMatchStart();
-	}
-}
-
-void AMyGameMode::SetupNewPlayer(APlayerController* newPlayer)
-{
-	/*ACMPlayerState* playerState = Cast<ACMPlayerState>(newPlayer->PlayerState);
-	if (playerState != NULL)
-	{
-		if (inGameState == InGameState::Warmup)
-			playerState->SetMoney(playerMaxMoney);
-		else
-			playerState->SetMoney(playerStartMoney);
-	}*/
+	if (denyRespawnList.Contains(player))
+		denyRespawnList.Remove(player);
 }
 
 void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
@@ -253,7 +286,7 @@ void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
 
 	if (respawnDelay <= 0.0f)
 	{
-		//RestartPlayer(player);
+		RestartPlayer(player);
 		return;
 	}
 
@@ -266,4 +299,42 @@ void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
 	//From different project;Might not be needed in this game
 	//FTimerDelegate respawnDelegate = FTimerDelegate::CreateUObject<ACMGameMode, AController*>(this, &ACMGameMode::RestartPlayer, player);
 	//GetWorld()->GetTimerManager().SetTimer(respawnTimerList[player], respawnDelegate, respawnDelay, false);
+}
+
+void AMyGameMode::OnMatchStart_Implementation()
+{
+	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
+	{
+		SetupNewPlayer(*iter);
+		//TODO!!!:MyPlayerController
+		(*iter)->OnMatchStart();
+	}
+}
+
+void AMyGameMode::SetupNewPlayer(APlayerController* newPlayer)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(newPlayer->PlayerState);
+	if (playerState != NULL)
+	{
+		if (inGameState == InGameState::Warmup)
+			playerState->SetMoney(playerMaxMoney);
+		else
+			playerState->SetMoney(playerStartMoney);
+	}
+}
+
+//TODO: this
+void AMyGameMode::OnPlayerRespawn_Implementation(AMyPlayerController* player)
+{
+	/*for (TActorIterator<ABuilderCharacter> iter(GetWorld()); iter; ++iter)
+		(*iter)->SetPlayerVisibility(false);*/
+}
+
+void AMyGameMode::OnWarmupStart_Implementation()
+{
+	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
+	{
+		SetupNewPlayer(*iter);
+		(*iter)->OnWarmupStart();
+	}
 }

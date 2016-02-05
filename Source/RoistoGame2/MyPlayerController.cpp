@@ -25,3 +25,8 @@ void AMyPlayerController::OnMatchStart_Implementation()
 {
 
 }
+
+void AMyPlayerController::OnWarmupStart_Implementation()
+{
+
+}

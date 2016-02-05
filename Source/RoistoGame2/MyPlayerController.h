@@ -21,6 +21,9 @@ public:
 
 	UFUNCTION(Reliable, Client)
 	void OnMatchStart();
+
+	UFUNCTION(Reliable, Client)
+	void OnWarmupStart();
 	
 protected:
 
