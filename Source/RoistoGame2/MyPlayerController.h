@@ -19,11 +19,31 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type endPlayReason) override;
+
+	virtual void SetupInputComponent() override;
+
+	/*UFUNCTION(Reliable, Server, WithValidation)
+	void ServerInitInventory();*/
+
+	void TryRespawn();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void RequestRespawn();
+
+	virtual void Possess(APawn* inPawn) override;
+	virtual void UnPossess() override;
+
+	void OnPlayerDeath();
+
 	UFUNCTION(Reliable, Client)
 	void OnMatchStart();
 
 	UFUNCTION(Reliable, Client)
 	void OnWarmupStart();
+
+	bool IsAlive();
 	
 protected:
 
@@ -32,4 +52,7 @@ protected:
 
 	UPROPERTY(REPLICATED)
 	bool isBuilding;
+
+	void OpenTeamChat();
+	void OpenAllChat();
 };
