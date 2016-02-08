@@ -29,8 +29,8 @@ public:
 
 	void TryRespawn();
 
-	UFUNCTION(Reliable, Server, WithValidation)
-	void RequestRespawn();
+	/*UFUNCTION(Reliable, Server, WithValidation)
+	void RequestRespawn();*/
 
 	virtual void Possess(APawn* inPawn) override;
 	virtual void UnPossess() override;

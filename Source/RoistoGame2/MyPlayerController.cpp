@@ -57,7 +57,19 @@ void AMyPlayerController::TryRespawn()
 	if (IsAlive())
 		return;
 
-	RequestRespawn();
+	//RequestRespawn();
+}
+
+
+
+void AMyPlayerController::Possess(APawn* inpPawn)
+{
+
+}
+
+void AMyPlayerController::UnPossess()
+{
+
 }
 
 void AMyPlayerController::OnMatchStart_Implementation()
@@ -74,6 +86,16 @@ bool AMyPlayerController::IsAlive()
 {
 	AMyPlayerState *playerState = Cast<AMyPlayerState>(PlayerState);
 	if (playerState != NULL)
-		return PlayerState->IsAlive();
+		return playerState->IsAlive();
 	return false;
+}
+
+void AMyPlayerController::OpenTeamChat()
+{
+
+}
+
+void AMyPlayerController::OpenAllChat()
+{
+
 }
