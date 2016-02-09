@@ -64,8 +64,8 @@ public:
 	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Elapsed"), Category = "Gameplay|Level")
 	int32 MapTimeElapsed();
 
-	////Returns bool can player respawn
-	//virtual bool CanPlayerRespawn(APlayerController* player);
+	//Returns bool can player respawn
+	virtual bool CanPlayerRespawn(APlayerController* player);
 	//Changes player to be able to respawn
 	void AllowPlayerRespawn(APlayerController* player);
 

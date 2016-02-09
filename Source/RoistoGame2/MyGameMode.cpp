@@ -2,7 +2,7 @@
 
 #include "RoistoGame2.h"
 #include "MyGameMode.h"
-#include "PlayerCar.h"
+#include "PlayerCarCode.h"
 #include "MyPlayerState.h"
 #include "Util.h"
 #include "MyPlayerController.h"
@@ -12,9 +12,9 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(ob
 	//Defaults for game mode, use blueprints to override
 
 	//Here be the final blueprinted player class
-	/*static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerCar(TEXT(""));
-	if (PlayerCar.Object)
-		DefaultPawnClass = (UClass*)PlayerCar.Object->GeneratedClass;*/
+	/*static ConstructorHelpers::FObjectFinder<UBlueprint> APlayerCarCode(TEXT(""));
+	if (APlayerCarCode.Object)
+		DefaultPawnClass = (UClass*)APlayerCarCode.Object->GeneratedClass;*/
 
 	//Here be the final blueprinted Hud class
 	/*static ConstructorHelpers<UBlueprint> PlayerHud(TEXT(""));
@@ -148,7 +148,7 @@ AActor* AMyGameMode::ChoosePlayerStart_Implementation(AController* player)
 
 void AMyGameMode::SetPlayerDefaults(APawn* playerPawn)
 {
-	APlayerCar* playerCar = Cast<APlayerCar>(playerPawn);
+	APlayerCarCode* playerCar = Cast<APlayerCarCode>(playerPawn);
 	if (playerCar == NULL)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: SetPlayerDefaults player pawn is not PlayerCharacter"));
@@ -188,7 +188,7 @@ void AMyGameMode::RestartPlayer(AController* controller)
 	}
 
 	//TODO: Check this part!
-	APlayerCar* playerCar = Cast<APlayerCar>(player->GetPawn());
+	APlayerCarCode* playerCar = Cast<APlayerCarCode>(player->GetPawn());
 	//TODO: add here buildPawn???
 	if (playerCar != NULL)
 	{
@@ -244,16 +244,6 @@ void AMyGameMode::WaitTickSecond()
 	
 }
 
-int32 AMyGameMode::MapTimeleft()
-{
-	return (mapTimelimit > 0) ? (mapTimelimit - mapTimeElapsed) : 0;
-}
-
-int32 AMyGameMode::MapTimeElapsed()
-{
-	return mapTimeElapsed;
-}
-
 void AMyGameMode::MapTickSecond()
 {
 	mapTimeElapsed++;
@@ -271,6 +261,24 @@ void AMyGameMode::MapTickSecond()
 		}
 	}
 	//UpdateGameState();
+}
+
+int32 AMyGameMode::MapTimeleft()
+{
+	return (mapTimelimit > 0) ? (mapTimelimit - mapTimeElapsed) : 0;
+}
+
+int32 AMyGameMode::MapTimeElapsed()
+{
+	return mapTimeElapsed;
+}
+
+bool AMyGameMode::CanPlayerRespawn(APlayerController* player)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(player->PlayerState);
+	if (playerState != NULL && !playerState->IsAlive() && !denyRespawnList.Contains(player))
+		return true;
+	return false;
 }
 
 void AMyGameMode::AllowPlayerRespawn(APlayerController* player)

@@ -4,6 +4,8 @@
 #include "UnrealNetwork.h"
 #include "MyPlayerController.h"
 #include "MyPlayerState.h"
+#include "PlayerCarCode.h"
+#include "MyGameMode.h"
 
 
 AMyPlayerController::AMyPlayerController(const FObjectInitializer& objectInitializer)
@@ -57,19 +59,58 @@ void AMyPlayerController::TryRespawn()
 	if (IsAlive())
 		return;
 
-	//RequestRespawn();
+	RequestRespawn();
 }
 
-
-
-void AMyPlayerController::Possess(APawn* inpPawn)
+bool AMyPlayerController::RequestRespawn_Validate()
 {
+	return true;
+}
+
+void AMyPlayerController::RequestRespawn_Implementation()
+{
+	AMyGameMode* gameMode = Cast<AMyGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (gameMode != NULL)
+	{
+		if (gameMode->CanPlayerRespawn(this))
+			gameMode->RespawnPlayer(this);
+	}
+}
+
+void AMyPlayerController::Possess(APawn* inPawn)
+{
+	Super::Possess(inPawn);
+
+	if (!HasAuthority())
+		return;
+
+	APlayerCarCode* pc = Cast<APlayerCarCode>(inPawn);
+	//ABuildChar* builder = Cast<>(inPawn);
+	if (pc != NULL /*&& builder == NULL*/)
+	{
+		//handle APlayerCarCode possession here
+	}
+	//else if (builder != NULL)
+	//{
+	//	//handle builder character possession here
+	//}
 
 }
 
 void AMyPlayerController::UnPossess()
 {
+	APlayerCarCode* pc = Cast<APlayerCarCode>(GetPawn());
+	//ABuildChar* builder = Cast<>(GetPawn());
+	if (pc != NULL /*&& builder == NULL*/)
+	{
+		//handle APlayerCarCode unpossession here
+	}
+	//else if (builder != NULL)
+	//{
+	//	//handle builder character unpossession here
+	//}
 
+	Super::UnPossess();
 }
 
 void AMyPlayerController::OnMatchStart_Implementation()

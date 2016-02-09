@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RoistoGame2.h"
-#include "PlayerCar.h"
+#include "PlayerCarCode.h"
 #include "Util.h"
 
 Util::Util()
@@ -12,14 +12,14 @@ Util::~Util()
 {
 }
 
-APlayerCar* Util::GetLocalPlayer(UWorld* world)
+APlayerCarCode* Util::GetLocalPlayer(UWorld* world)
 {
-	return Cast<APlayerCar>(world->GetFirstPlayerController()->GetPawn());
+	return Cast<APlayerCarCode>(world->GetFirstPlayerController()->GetPawn());
 }
 
-APlayerCar* Util::GetPlayerCar(APlayerController* player)
+APlayerCarCode* Util::GetPlayerCar(APlayerController* player)
 {
-	return Cast<APlayerCar>(player->GetPawn());
+	return Cast<APlayerCarCode>(player->GetPawn());
 }
 
 int32 Util::GetNumPlayers(UWorld* world)
@@ -34,7 +34,7 @@ int32 Util::GetNumPlayers(UWorld* world)
 
 //TODO: Check if this function is even needed
 //TODO: If needed fix this
-float Util::GetDistanceToPlayer(const AActor* object, const APlayerCar* player)
+float Util::GetDistanceToPlayer(const AActor* object, const APlayerCarCode* player)
 {
 	FVector objectLoc = object->GetActorLocation();
 	FVector playerLoc = player->GetActorLocation();

@@ -13,8 +13,8 @@ public:
 	Util();
 	~Util();
 
-	static class APlayerCar* GetLocalPlayer(UWorld* world);
-	static class APlayerCar* GetPlayerCar(APlayerController* player);
+	static class APlayerCarCode* GetLocalPlayer(UWorld* world);
+	static class APlayerCarCode* GetPlayerCar(APlayerController* player);
 	static int32 GetNumPlayers(UWorld* world);
 
 	//from https://wiki.unrealengine.com/Dynamic_Load_Object
@@ -48,6 +48,6 @@ public:
 	}
 
 	// Distance to player's capsule component
-	static float GetDistanceToPlayer(const AActor* object, const class APlayerCar* player);
+	static float GetDistanceToPlayer(const AActor* object, const class APlayerCarCode* player);
 
 };

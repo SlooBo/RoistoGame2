@@ -2,19 +2,22 @@
 
 #pragma once
 
-#include "GameFramework/Pawn.h"
+#include "BasePawn.h"
 #include "CarMovementComponent.h"
 #include "MyPlayerController.h"
-#include "PlayerCar.generated.h"
+#include "PlayerCarCode.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class ROISTOGAME2_API APlayerCar : public APawn
+class ROISTOGAME2_API APlayerCarCode : public ABasePawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	APlayerCar(const FObjectInitializer& ObjectInitializer);
+	APlayerCarCode(const FObjectInitializer& ObjectInitializer);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,3 +47,4 @@ protected:
 
 	class UCarMovementComponent* MyMovementComponent;
 };
+

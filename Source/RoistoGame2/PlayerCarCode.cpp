@@ -1,13 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RoistoGame2.h"
-#include "PlayerCar.h"
-
+#include "PlayerCarCode.h"
 
 // Sets default values
-APlayerCar::APlayerCar(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer)
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	//Root component is box because car
@@ -28,7 +27,7 @@ APlayerCar::APlayerCar(const class FObjectInitializer& ObjectInitializer) : Supe
 		CarMesh->SetStaticMesh(meshToUse);
 	}
 	//TODO: Find a proper way to set mesh
-	
+
 
 
 
@@ -49,42 +48,44 @@ APlayerCar::APlayerCar(const class FObjectInitializer& ObjectInitializer) : Supe
 }
 
 // Called when the game starts or when spawned
-void APlayerCar::BeginPlay()
+void APlayerCarCode::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
-void APlayerCar::Tick( float DeltaTime )
+void APlayerCarCode::Tick(float DeltaTime)
 {
-	Super::Tick( DeltaTime );
+	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void APlayerCar::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+void APlayerCarCode::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
-	//InputComponent->BindAction("Shoot",IE_Pressed,this,&APlayerCar::);
+	//InputComponent->BindAction("Shoot",IE_Pressed,this,&PlayerCarCode::);
 
-	InputComponent->BindAxis("MoveForward", this, &APlayerCar::MoveForward);
-	InputComponent->BindAxis("TurnRight", this, &APlayerCar::Turn);
+	InputComponent->BindAxis("MoveForward", this, &APlayerCarCode::MoveForward);
+	InputComponent->BindAxis("TurnRight", this, &APlayerCarCode::Turn);
+	InputComponent->BindAxis("MoveForwardPad", this, &APlayerCarCode::MoveForward);
+	InputComponent->BindAxis("TurnRightPad", this, &APlayerCarCode::Turn);
 
 }
 
-UPawnMovementComponent* APlayerCar::GetMovementComponent() const
+UPawnMovementComponent* APlayerCarCode::GetMovementComponent() const
 {
 	return MyMovementComponent;
 }
 
-//UBoxComponent* APlayerCar::getHitBox()
+//UBoxComponent* PlayerCarCode::getHitBox()
 //{
 //	return  MyHitBox;
 //}
 
-void APlayerCar::MoveForward(float AxisValue)
+void APlayerCarCode::MoveForward(float AxisValue)
 {
 	if (MyMovementComponent && (MyMovementComponent->UpdatedComponent == RootComponent))
 	{
@@ -92,9 +93,12 @@ void APlayerCar::MoveForward(float AxisValue)
 	}
 }
 
-void APlayerCar::Turn(float AxisValue)
+void APlayerCarCode::Turn(float AxisValue)
 {
 	FRotator NewRotation = GetActorRotation();
 	NewRotation.Yaw += AxisValue;
 	SetActorRotation(NewRotation);
 }
+
+
+
