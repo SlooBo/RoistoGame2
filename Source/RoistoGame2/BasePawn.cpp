@@ -33,6 +33,11 @@ void ABasePawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 }
 
+void ABasePawn::FellOutOfWorld(const class UDamageType& DmgType)
+{
+	OnDeath();
+}
+
 void ABasePawn::DelayedDestroy()
 {
 	FTimerHandle timerHandle;
@@ -44,7 +49,7 @@ void ABasePawn::DelayedDestroy()
 	SetActorTickEnabled(false);
 }
 
-void ABasePawn::OnDeath_Implementation(AMyplayerController* damageSource)
+void ABasePawn::OnDeath_Implementation(AMyPlayerController* damageSource)
 {
 	// delay the destruction until the player controller no longer controls this character
 	// if pawn is destroyed before the controller acknowledges it, crash happens
