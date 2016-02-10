@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include "MyPlayerController.h"
 #include "BasePawn.generated.h"
 
 UCLASS()
@@ -23,6 +24,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
-	
+	virtual void FellOutOfWorld(const class UDamageType& DmgType) override;
+
+	void DelayedDestroy();
+
+protected:
+
+
+	UFUNCTION(Reliable, NetMulticast)
+	void OnDeath(AMyPlayerController* damageSource = NULL);
+	virtual void OnDeath_Implementation(AMyPlayerController* damageSource = NULL);
+
+	void DelayedDestroy(FTimerHandle& timerHandle);
 	
 };

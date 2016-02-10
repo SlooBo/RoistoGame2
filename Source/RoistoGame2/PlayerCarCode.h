@@ -4,7 +4,6 @@
 
 #include "BasePawn.h"
 #include "CarMovementComponent.h"
-#include "MyPlayerController.h"
 #include "PlayerCarCode.generated.h"
 
 /**
