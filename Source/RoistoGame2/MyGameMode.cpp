@@ -239,6 +239,12 @@ void AMyGameMode::RestartPlayer(AController* controller)
 	OnPlayerRespawn(player);
 }
 
+//TODO:THIS
+void AMyGameMode::UpdateGameState()
+{
+
+}
+
 void AMyGameMode::WaitTickSecond()
 {
 	

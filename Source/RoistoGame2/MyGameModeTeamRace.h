@@ -3,7 +3,17 @@
 #pragma once
 
 #include "MyGameMode.h"
+#include "BuilderPawn.h"
 #include "MyGameModeTeamRace.generated.h"
+
+UENUM(BlueprintType)
+enum class TeamRaceState : uint8
+{
+	Start = 0,
+	Freeze,
+	Round,
+	End,
+};
 
 /**
  * 
@@ -15,110 +25,63 @@ class ROISTOGAME2_API AMyGameModeTeamRace : public AMyGameMode
 public:
 	AMyGameModeTeamRace(const class FObjectInitializer& objectInitializer);
 
-	static FString GetInGameStateAsString(InGameState state);
-	InGameState GetInGameState() { return inGameState; };
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& changedEvent) override;
+#endif
+
+	static FString GetTeamRaceStateAsString(InGameState state);
 
 	//Overrides
-	virtual void StartNewPlayer(APlayerController* newPlayer) override;
+	//virtual void HandleMathcIsWaitingToStart() override;
+	virtual void OnMatchStart_Implementation() override;
 	virtual void Logout(AController* exiting) override;
-	virtual void HandleMatchIsWaitingToStart() override;
-	virtual void StartMatch() override;
+	virtual void SetupNewPlayer(APlayerController* newPlayer) override;
 
-	virtual bool ShouldSpawnAtStartSpot(AController* player) override;
-	virtual AActor* ChoosePlayerStart_Implementation(AController* player) override;
-	virtual void SetPlayerDefaults(APawn* playerPawn) override;
-	virtual void RestartPlayer(AController* controller) override;
+	//// Event when player dies or is killed by other player
+	//virtual void OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer = NULL);
 
-	//virtual void UpdateGameState();
+	void TeamRaceTickSecond();
 
-	void WaitTickSecond();
-	void MapTickSecond();
-
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Left"), Category = "Gameplay|Level")
-		int32 MapTimeleft();
-
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Map Time Elapsed"), Category = "Gameplay|Level")
-		int32 MapTimeElapsed();
-
-	//Returns bool can player respawn
-	virtual bool CanPlayerRespawn(APlayerController* player);
-	//Changes player to be able to respawn
-	void AllowPlayerRespawn(APlayerController* player);
-
-	//Respawns player
-	UFUNCTION(BlueprintCallable, Meta = (Displayname = "Respawn Player"), Category = "Gameplay|Player")
-		void RespawnPlayer(APlayerController* player, float respawnDelay = 0.0f);
-
-	//Event when match has started
-	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Match Start"), Category = "Gameplay")
-		void OnMatchStart();
-	virtual void OnMatchStart_Implementation();
+	virtual void UpdateGameState() override;
 
 
-	virtual void SetupNewPlayer(APlayerController* newPlayer);
-
-	// Event when player respawns
-	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Respawn"), Category = "Gameplay|Player")
-		void OnPlayerRespawn(AMyPlayerController* player);
-	virtual void OnPlayerRespawn_Implementation(AMyPlayerController* player);
-
-	// Event when warmup has started
-	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Warmup Start"), Category = "Gameplay")
-		void OnWarmupStart();
-	virtual void OnWarmupStart_Implementation();
-
-	int32 GetPlayerMaxMoney() { return playerMaxMoney; };
 
 protected:
 
-	//TArray<APlayerController*> denyRespawnList;
-	//TMap<APlayerController*, FTimerHandle> respawnTimerList;
+	FTimerHandle teamRaceTimerHandle; //Ticks once every second during hunt
+	int32 teamRaceElapsed;
+	int32 teamRaceFreezeElapsed;
 
-	//// Timelimit in minutes
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Map Timelimit", ClampMin = "0"), Category = "Gameplay|Level")
-	//	int32 mapTimelimit;
-
-	//int32 mapTimeElapsed;
-	//int32 waitElapsed;
-
-	//FTimerHandle mapTimerHandle;	// Ticks once every second when the main game mode is running
-	//FTimerHandle waitTimer;			// Wait for players timer before game starts
-
-	////Current state of the game mode
-	//UPROPERTY(BluePrintReadOnly, Category = Enum)
-	//	InGameState inGameState;
-
-	//// Respawning mode
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Respawn Mode"), Category = Enum)
-	//	RespawnMode respawnMode;
-
-	//// Time to wait before game mode starts
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Start Delay Time", ClampMin = "0"), Category = "Gameplay|Level")
-	//	int32 startTime;
-
-	//// Max Length of warmup while waiting for players to join
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Warmup Time", ClampMin = "0"), Category = "Gameplay|Level")
-	//	int32 warmupTime;
-
-	//// Player respawn time after death (-1: respawning disabled)
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Player Respawn Time", ClampMin = "-1"), Category = "Gameplay|Level")
-	//	int32 playerRespawnTime;
-
-	////
-	////	Money / Kill Rewards
-	////
-
-	//// Start money for each player
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Player Start Money"), Category = "Gameplay|Money")
-	//	int32 playerStartMoney;
-
-	//// Limit maximum money players can have
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Player Max Money"), Category = "Gameplay|Money")
-	//	int32 playerMaxMoney;
-
-	//// Reward for stuff
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Player Kill Reward Target"), Category = "Gameplay|Money")
-	//	int32 playerReward;
+	//Current state of the team race
+	UPROPERTY(BlueprintReadOnly, Category = Enum)
+	TeamRaceState teamRaceState;
 	
-	
+	//
+	//	Round Settings
+	//
+
+	//Count of team race round
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Teamrace Rounds", ClampMin = "0"), Category = "Gameplay|TeamRace")
+	int32 teamRaceRounds;
+
+	// Length of one hunt round
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Teamrace Round Length", ClampMin = "0"), Category = "Gameplay|TeamRace")
+		int32 teamRaceRoundLength;
+
+	// Freeze time length at the beginning of a round
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Teamrace Freeze Time Length", ClampMin = "0"), Category = "Gameplay|TeamRace")
+		int32 teamRaceRoundFreezeLength;
+
+
+	// Total length of hunt match (calculated from previous values)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Meta = (DisplayName = "Teamrace Total Length"), Category = "Gameplay|TeamRace")
+		int32 teamRaceTotalLength;
+
+	//
+	//	Hunt Money / Kill Rewards
+	//
+
+	// Money given at the end of round
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Teamrace Round Reward"), Category = "Gameplay|TeamRace")
+	int32 teamRaceRoundReward;
 };

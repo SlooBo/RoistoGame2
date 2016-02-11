@@ -53,7 +53,7 @@ public:
 	virtual void SetPlayerDefaults(APawn* playerPawn) override;
 	virtual void RestartPlayer(AController* controller) override;
 
-	//virtual void UpdateGameState();
+	virtual void UpdateGameState();
 
 	void WaitTickSecond();
 	void MapTickSecond();
@@ -120,6 +120,10 @@ protected:
 	// Respawning mode
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Respawn Mode"), Category = Enum)
 	RespawnMode respawnMode;
+
+	// Start the game mode when at least this many players has joined
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Minimum Players To Start", ClampMin = "0", ClampMax = "64"), Category = "Gameplay|Level")
+	int32 minPlayersToStart;
 
 	// Time to wait before game mode starts
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Start Delay Time", ClampMin = "0"), Category = "Gameplay|Level")
