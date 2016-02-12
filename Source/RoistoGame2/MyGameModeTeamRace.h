@@ -50,7 +50,9 @@ protected:
 
 	FTimerHandle teamRaceTimerHandle; //Ticks once every second during hunt
 	int32 teamRaceElapsed;
+	int32 teamRaceCurrentRound;
 	int32 teamRaceFreezeElapsed;
+	int32 teamRaceRoundElapsed;
 
 	//Current state of the team race
 	UPROPERTY(BlueprintReadOnly, Category = Enum)

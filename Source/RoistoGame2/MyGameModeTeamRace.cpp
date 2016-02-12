@@ -2,6 +2,7 @@
 
 #include "RoistoGame2.h"
 #include "MyGameModeTeamRace.h"
+#include "MyGameState.h"
 #include "PlayerCarCode.h"
 #include "MyPlayerState.h"
 #include "Util.h"
@@ -93,4 +94,30 @@ void AMyGameModeTeamRace::TeamRaceTickSecond()
 void AMyGameModeTeamRace::UpdateGameState()
 {
 	Super::UpdateGameState();
+
+	AMyGameState* gameState = Cast<AMyGameState>(GameState);
+	if (gameState != NULL)
+	{
+		gameState->teamRaceState = this->teamRaceState;
+		gameState->gameTimeElapsed = teamRaceElapsed;
+		gameState->gameTimeLength = teamRaceTotalLength;
+		gameState->teamRaceTotalRounds = teamRaceRounds;
+		gameState->teamRaceCurrentRound = teamRaceCurrentRound;
+		if (teamRaceState == TeamRaceState::Freeze)
+		{
+			gameState->stateTimeElapsed = teamRaceFreezeElapsed;
+			gameState->stateTimeLength = teamRaceRoundFreezeLength;
+		}
+		else
+		{
+			gameState->stateTimeElapsed = teamRaceRoundElapsed;
+			gameState->stateTimeLength = teamRaceRoundLength;
+		}
+		if (inGameState != InGameState::Running)
+		{
+			gameState->stateTimeLength = waitElapsed;
+			gameState->teamRaceCurrentRound = 0;
+		}
+
+	}
 }

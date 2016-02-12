@@ -2,6 +2,7 @@
 
 #include "RoistoGame2.h"
 #include "MyGameMode.h"
+#include "MyGameState.h"
 #include "PlayerCarCode.h"
 #include "MyPlayerState.h"
 #include "Util.h"
@@ -242,7 +243,31 @@ void AMyGameMode::RestartPlayer(AController* controller)
 //TODO:THIS
 void AMyGameMode::UpdateGameState()
 {
+	AMyGameState* gameState = Cast<AMyGameState>(GameState);
+	if (gameState != NULL)
+	{
+		gameState->inGameState = inGameState;
+		gameState->gameTimeElapsed = mapTimeElapsed;
+		gameState->gameTimeLength = mapTimelimit;
 
+		if (inGameState == InGameState::Warmup || inGameState == InGameState::WarmupStarting)
+		{
+			gameState->stateTimeElapsed = waitElapsed;
+			gameState->stateTimeLength = waitElapsed;
+			gameState->gameTimeElapsed = waitElapsed;
+			gameState->gameTimeLength = warmupTime;
+		}
+		else if (inGameState == InGameState::Starting)
+		{
+			gameState->stateTimeElapsed = waitElapsed;
+			gameState->stateTimeLength = startTime;
+		}
+		else
+		{
+			gameState->stateTimeElapsed = mapTimeElapsed;
+			gameState->stateTimeLength = mapTimelimit;
+		}
+	}
 }
 
 void AMyGameMode::WaitTickSecond()
