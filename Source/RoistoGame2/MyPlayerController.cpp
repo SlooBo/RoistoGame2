@@ -5,6 +5,7 @@
 #include "MyPlayerController.h"
 #include "MyPlayerState.h"
 #include "PlayerCarCode.h"
+#include "PlayerHUD.h"
 #include "MyGameMode.h"
 
 
@@ -111,6 +112,26 @@ void AMyPlayerController::UnPossess()
 	//}
 
 	Super::UnPossess();
+}
+
+void AMyPlayerController::OnPlayerDeath()
+{
+
+}
+
+void AMyPlayerController::OnPlayerDeathBroadcast_Implementation(AMyPlayerController* killed, AMyPlayerController* killer/*, AWeapon* weapon*/)
+{
+	if (killed == this)
+	{
+		/*APlayerHud* hud = Cast<APlayerHUD>(GetHUD());
+		if (hud != nullptr)
+		{
+			hud->ShowText("After 5 seconds press R to respawn", 32, 0.5f, 0.05f, 10, FLinearColor::Red);
+			hud->ShowText("Press B to open shop", 32, 0.5f, 0.95f, 10, FLinearColor::Red);
+		}*/
+		//handle clientside death here
+	}
+	// handle kill messages and other death related stuff here
 }
 
 void AMyPlayerController::OnMatchStart_Implementation()

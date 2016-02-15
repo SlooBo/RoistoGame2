@@ -38,6 +38,9 @@ public:
 	void OnPlayerDeath();
 
 	UFUNCTION(Reliable, Client)
+	void OnPlayerDeathBroadcast(AMyPlayerController* killed, AMyPlayerController* killer/*, AWeapon* weapon*/);
+
+	UFUNCTION(Reliable, Client)
 	void OnMatchStart();
 
 	UFUNCTION(Reliable, Client)

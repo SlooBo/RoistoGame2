@@ -137,6 +137,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Player Respawn Time", ClampMin = "-1"), Category = "Gameplay|Level")
 	int32 playerRespawnTime;
 
+	// Minimum player wait time before respawning is allowed (-1: wait until player is respawned by server)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Player Minimum Respawn Time", ClampMin = "-1"), Category = "Gameplay|Level")
+	int32 playerRespawnTimeMinimum;
+
 	//
 	//	Money / Kill Rewards
 	//

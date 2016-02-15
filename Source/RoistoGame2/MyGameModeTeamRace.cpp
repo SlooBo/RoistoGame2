@@ -49,10 +49,10 @@ FString AMyGameModeTeamRace::GetTeamRaceStateAsString(InGameState state)
 	return enumptr->GetEnumName((uint8)state);
 }
 
-//void AMyGameModeTeamRace::HandleMatchIsWaitingToStart()
-//{
-//	Super::HandleMatchIsWaitingToStart();
-//}
+void AMyGameModeTeamRace::HandleMatchIsWaitingToStart()
+{
+	Super::HandleMatchIsWaitingToStart();
+}
 
 
 void AMyGameModeTeamRace::OnMatchStart_Implementation()
@@ -83,6 +83,55 @@ void AMyGameModeTeamRace::SetupNewPlayer(APlayerController* newPlayer)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Error: PlayerController is not MyPlayerController"));
 		return;
 	}
+}
+
+void AMyGameModeTeamRace::OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(player->PlayerState);
+	AMyPlayerState* killerState = (killer != NULL) ? Cast<AMyPlayerState>(killer->PlayerState) : NULL;
+
+	if (playerState == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: OnPlayerDeath playerState is null"));
+		return;
+	}
+
+	playerState->SetAlive(false);
+
+	if (killerState != NULL)
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" killed ") + killerState->PlayerName);
+	else if (killer == player)
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" committed suicide"));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" died"));
+
+	
+	player->OnPlayerDeath();
+
+	// broadcast death for everyone
+	/*for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
+		(*iter)->OnPlayerDeathBroadcast(player, killer);*/
+
+	//// turn player into spectator
+	//SpectatePlayer(player);
+
+	const int32 respawnTime = (inGameState != InGameState::Warmup) ? playerRespawnTime : 0;
+
+	// deny further respawn requests
+	if (playerRespawnTimeMinimum != 0)
+	{
+		denyRespawnList.AddUnique(player);
+
+		// allow manual respawning after minimum period of time
+		if (playerRespawnTimeMinimum < respawnTime)
+		{
+			FTimerHandle timerHandle;
+			FTimerDelegate allowDelegate = FTimerDelegate::CreateUObject<AMyGameMode, APlayerController*>(this, &AMyGameMode::AllowPlayerRespawn, player);
+			GetWorld()->GetTimerManager().SetTimer(timerHandle, allowDelegate, playerRespawnTimeMinimum, false);
+		}
+	}
+
+	RespawnPlayer(player, respawnTime);
 }
 
 void AMyGameModeTeamRace::TeamRaceTickSecond()
