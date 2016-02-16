@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Object.h"
-#include "SUserWidget.h"
 #include "UILogicBase.generated.h"
 
 /**
@@ -16,29 +15,29 @@ class ROISTOGAME2_API UUILogicBase : public UObject
 public:
 	UUILogicBase();
 	~UUILogicBase();
-//	virtual void Update(){}
-//	template <typename type>
-//	//TODO: Move this to cpp, if possible
-//	bool SetValueFromWidget(type **saveValueHere, FString name)
-//	{
-//		UWidgetTree *widgetTree = baseWidget->WidgetTree;
-//		TArray<UWidget*> children;
-//		widgetTree->GetAllWidgets(children);
-//
-//		int childcount = children.Num();
-//		for (int i = 0; i < childcount; i++)
-//		{
-//			type *tempValue = Cast<type>(children[i]);
-//			UWidget *userWidget = Cast<UWidget>(children[i]);
-//			if (tempValue != nullptr && userWidget != nullptr && userWidget->GetName().ToLower().Equals(name.ToLower()))
-//			{
-//				*saveValueHere = Cast<type>(children[i]);
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//protected:
-//	UPROPERTY()
-//	SUserWidget *baseWidget;
+	virtual void Update(){}
+	//TODO: Move this to cpp?
+	template <typename type>
+	bool SetValueFromWidget(type **saveValueHere, FString name)
+	{
+		UWidgetTree *widgetTree = baseWidget->WidgetTree;
+		TArray<UWidget*> children;
+		widgetTree->GetAllWidgets(children);
+
+		int childcount = children.Num();
+		for (int i = 0; i < childcount; i++)
+		{
+			type *tempValue = Cast<type>(children[i]);
+			UWidget *userWidget = Cast<UWidget>(children[i]);
+			if (tempValue != nullptr && userWidget != nullptr && userWidget->GetName().ToLower().Equals(name.ToLower()))
+			{
+				*saveValueHere = Cast<type>(children[i]);
+				return true;
+			}
+		}
+		return false;
+	}
+protected:
+	UPROPERTY()
+	UUserWidget *baseWidget;
 };
