@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RoistoGame2.h"
+#include "HUDLogic.h"
 #include "PlayerHUD.h"
 
 APlayerHUD::APlayerHUD(const FObjectInitializer& PCIP) : Super()

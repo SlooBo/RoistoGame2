@@ -44,10 +44,10 @@ public:
 		TeamRaceState GetTeamRaceState() { return teamRaceState; }
 
 	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get Current Hunt Round"), Category = "Gameplay")
-		int32 GetHuntCurrentRound() { return teamRaceCurrentRound; }
+		int32 GetTeamRaceCurrentRound() { return teamRaceCurrentRound; }
 
 	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get Hunt Rounds Total"), Category = "Gameplay")
-		int32 GetHuntTotalRounds() { return teamRaceTotalRounds; }
+		int32 GetTeamRaceTotalRounds() { return teamRaceTotalRounds; }
 
 	// Current state of the base game mode
 	UPROPERTY(Replicated)
