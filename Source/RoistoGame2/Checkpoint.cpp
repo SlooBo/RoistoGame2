@@ -15,7 +15,7 @@ ACheckpoint::ACheckpoint()
 	MyHitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
 	RootComponent = MyHitBox;
 	//TODO:Adjust these
-	MyHitBox->SetBoxExtent(FVector(500.0f, 100.0f, 500.0f));
+	MyHitBox->SetBoxExtent(FVector(1500.0f, 100.0f, 700.0f));
 	MyHitBox->SetVisibility(true);
 }
 

@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RoistoGame2.h"
+#include "UnrealNetwork.h"
+#include "MyPlayerState.h"
 #include "PlayerCarCode.h"
 
 // Sets default values
@@ -45,6 +47,13 @@ APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer
 	// Create an instance of our movement component, and tell it to update our root component.
 	MyMovementComponent = CreateDefaultSubobject<UCarMovementComponent>(TEXT("CustomMovementComponetn"));
 	MyMovementComponent->UpdatedComponent = RootComponent;
+
+	//set gameplay values
+	Checkpoint1 = false;
+	Checkpoint2 = false;
+	Checkpoint3 = false;
+
+	lap = 0;
 }
 
 // Called when the game starts or when spawned
@@ -75,6 +84,18 @@ void APlayerCarCode::SetupPlayerInputComponent(class UInputComponent* InputCompo
 
 }
 
+void APlayerCarCode::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Value is already updated locally, skip in replication step
+	//DOREPLIFETIME_CONDITION(APlayerCharacter, value, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(APlayerCarCode, lap, COND_SkipOwner);
+
+	//Replicated to every client, no special condition required
+	//DOREPLIFETIME(APlayerCharacter, value);
+}
+
 UPawnMovementComponent* APlayerCarCode::GetMovementComponent() const
 {
 	return MyMovementComponent;
@@ -100,5 +121,37 @@ void APlayerCarCode::Turn(float AxisValue)
 	SetActorRotation(NewRotation);
 }
 
+void APlayerCarCode::addCheckpoint1()
+{
+	Checkpoint1 = true;
+}
 
+void APlayerCarCode::addCheckpoint2()
+{
+	Checkpoint2 = true;
+}
+
+void APlayerCarCode::addCheckpoint3()
+{
+	Checkpoint3 = true;
+}
+
+void APlayerCarCode::addLap()
+{
+	if (Checkpoint1 && Checkpoint2 && Checkpoint3)
+	{
+		lap++;
+		Checkpoint1 = false;
+		Checkpoint2 = false;
+		Checkpoint3 = false;
+		AMyPlayerState* playerState = Cast<AMyPlayerState>(PlayerState);
+		if (playerState == nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Major error during lap finish!");
+			return;
+		}
+		//TODO:Adjust this
+		playerState->AddMoney(500);
+	}
+}
 

@@ -27,6 +27,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
 	virtual UPawnMovementComponent* GetMovementComponent() const override;
 
 	//MovementControls
@@ -39,10 +41,24 @@ public:
 	UStaticMeshComponent* WheelMesh;
 
 	//const UBoxComponent* getHitBox();
+	UFUNCTION(Exec)
+	void addCheckpoint1();
+	UFUNCTION(Exec)
+	void addCheckpoint2();
+	UFUNCTION(Exec)
+	void addCheckpoint3();
+	UFUNCTION(Exec)
+	void addLap();
 
 protected:
 
 	UBoxComponent* MyHitBox;
+	bool Checkpoint1;
+	bool Checkpoint2;
+	bool Checkpoint3;
+
+	UPROPERTY(VisibleAnywhere, Replicated, Category = "PlayerCondition")
+	int32 lap;
 
 	class UCarMovementComponent* MyMovementComponent;
 };

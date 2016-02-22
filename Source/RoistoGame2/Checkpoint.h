@@ -23,7 +23,7 @@ public:
 	
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Ordinal number of checkpoint", ClampMin = "0", ClampMax = "10"), Category = "Gameplay|Checkpoint")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "Ordinal number of checkpoint", ClampMin = "0", ClampMax = "5"), Category = "Gameplay|Checkpoint")
 	int32 ordinal;
 
 	UBoxComponent* MyHitBox;
