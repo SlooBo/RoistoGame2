@@ -41,13 +41,13 @@ public:
 	UStaticMeshComponent* WheelMesh;
 
 	//const UBoxComponent* getHitBox();
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint1"), Category = "Gameplay | Player")
 	void addCheckpoint1();
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint2"), Category = "Gameplay | Player")
 	void addCheckpoint2();
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint3"), Category = "Gameplay | Player")
 	void addCheckpoint3();
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Survived lap"), Category = "Gameplay|Player")
 	void addLap();
 
 protected:

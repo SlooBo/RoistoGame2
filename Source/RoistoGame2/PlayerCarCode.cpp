@@ -140,6 +140,7 @@ void APlayerCarCode::addLap()
 {
 	if (Checkpoint1 && Checkpoint2 && Checkpoint3)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, " Survived lap !!!");
 		lap++;
 		Checkpoint1 = false;
 		Checkpoint2 = false;
@@ -154,4 +155,3 @@ void APlayerCarCode::addLap()
 		playerState->AddMoney(500);
 	}
 }
-
