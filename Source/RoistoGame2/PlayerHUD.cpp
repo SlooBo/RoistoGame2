@@ -1,24 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RoistoGame2.h"
-#include "HUDLogic.h"
 #include "PlayerHUD.h"
+#include "HUDLogic.h"
+#include "MyPlayerController.h"
+#include "PlayerCarCode.h"
 
 APlayerHUD::APlayerHUD(const FObjectInitializer& PCIP) : Super()
 {
-	/*currentMenu = MenuType::NO_UI;
-	static ConstructorHelpers::FObjectFinder<UClass> MainMenuBP(TEXT("'/Game/Game/UI/AnimatedMainMenu.AnimatedMainMenu_C'"));
+	currentMenu = MenuType::NO_UI;
+	static ConstructorHelpers::FObjectFinder<UClass> MainMenuBP(TEXT("'/Game/UI/Menus/MainMenuWidget.MainMenuWidget_C'"));
 	if (MainMenuBP.Object)
 	{
 		mainMenuClass = (UClass*)MainMenuBP.Object;
 	}
-
-	static ConstructorHelpers::FObjectFinder<UClass> GameUIBP(TEXT("'/Game/Game/UI/GameUI.GameUI_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> GameUIBP(TEXT("'/Game/UI/GameUI.GameUI_C'"));
 	if (GameUIBP.Object)
 	{
 		gameUIClass = (UClass*)GameUIBP.Object;
 	}
 
+	/*
 	static ConstructorHelpers::FObjectFinder<UClass> ServerBrowserBP(TEXT("'/Game/Game/UI/ServerBrowserGUI.ServerBrowserGUI_C'"));
 	if (ServerBrowserBP.Object)
 	{
@@ -77,62 +79,62 @@ void APlayerHUD::DrawHUD()
 
 void APlayerHUD::changeUIElement(MenuType menu)
 {
-	//currentMenu = menu;
-	//for (int i = 0; i < logicClasses.Num(); i++)
-	//{
-	//	logicClasses[i]->ConditionalBeginDestroy();
-	//	logicClasses[i] = NULL;
-	//}
-	//logicClasses.Empty();
+	currentMenu = menu;
+	for (int i = 0; i < logicClasses.Num(); i++)
+	{
+		logicClasses[i]->ConditionalBeginDestroy();
+		logicClasses[i] = NULL;
+	}
+	logicClasses.Empty();
 
-	//APlayerController* controller = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	APlayerController* controller = Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
 
-	//controller->bShowMouseCursor = false;
-	//ClearAllWidgets();
+	controller->bShowMouseCursor = false;
+	ClearAllWidgets();
 
-	//if (controller == NULL)
-	//	return;
+	if (controller == NULL)
+		return;
 
 
-	//switch (menu)
-	//{
-	//case MenuType::MAIN_MENU:
-	//{
-	//	UUserWidget* widget = changeUIElement(mainMenuClass);
+	switch (menu)
+	{
+	case MenuType::MAIN_MENU:
+	{
+		UUserWidget* widget = changeUIElement(mainMenuClass);
 
-	//	UMainMenuLogic* mainMenuLogic = NewObject<UMainMenuLogic>();
-	//	mainMenuLogic->SetUp(widget, GetWorld());
-	//	logicClasses.Add(mainMenuLogic);
+		//UMainMenuLogic* mainMenuLogic = NewObject<UMainMenuLogic>();
+		//mainMenuLogic->SetUp(widget, GetWorld());
+		//logicClasses.Add(mainMenuLogic);
 
-	//	//this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-	//	break;
-	//}
-	//case MenuType::GAME_UI:
-	//{
-	//	controller->bShowMouseCursor = false;
-	//	//this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
-	//	UUserWidget* widget;
+		////this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		break;
+	}
+	case MenuType::GAME_UI:
+	{
+		controller->bShowMouseCursor = false;
+		//this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		UUserWidget* widget;
 
-	//	widget = changeUIElement(gameUIClass);
-	//	UHUDLogic* hudLogic = NewObject<UHUDLogic>();
-	//	hudLogic->SetUp(widget, GetWorld());
-	//	logicClasses.Add(hudLogic);
+		widget = changeUIElement(gameUIClass);
+		UHUDLogic* hudLogic = NewObject<UHUDLogic>();
+		hudLogic->SetUp(widget, GetWorld());
+		logicClasses.Add(hudLogic);
 
-	//	FInputModeGameOnly InputMode;
-	//	controller->SetInputMode(InputMode);
+		FInputModeGameOnly InputMode;
+		controller->SetInputMode(InputMode);
 
-	//	break;
-	//}
-	//case MenuType::SERVER_BROWSER:
-	//{
-	//	controller->bShowMouseCursor = true;
-	//	UUserWidget* widget;
-	//	widget = changeUIElement(serverBrowserClass);
-	//	UServerBrowserLogic* serverBrowser = NewObject<UServerBrowserLogic>();
-	//	serverBrowser->SetUp(widget, GetWorld());
-	//	logicClasses.Add(serverBrowser);
-	//	break;
-	//}
+		break;
+	}
+	case MenuType::SERVER_BROWSER:
+	{
+		/*controller->bShowMouseCursor = true;
+		UUserWidget* widget;
+		widget = changeUIElement(serverBrowserClass);
+		UServerBrowserLogic* serverBrowser = NewObject<UServerBrowserLogic>();
+		serverBrowser->SetUp(widget, GetWorld());
+		logicClasses.Add(serverBrowser);*/
+		break;
+	}
 	//case MenuType::SHOP:
 	//{
 	//	//also show hud
@@ -154,37 +156,37 @@ void APlayerHUD::changeUIElement(MenuType menu)
 	//	controller->SetInputMode(InputMode);
 	//	break;
 	//}
-	//case MenuType::PAUSE_MENU:
-	//{
-	//	controller->bShowMouseCursor = true;
-	//	UUserWidget* widget = changeUIElement(pauseClass);
+	/*case MenuType::PAUSE_MENU:
+	{
+		controller->bShowMouseCursor = true;
+		UUserWidget* widget = changeUIElement(pauseClass);
 
-	//	FInputModeGameAndUI InputMode;
-	//	InputMode.SetWidgetToFocus(widget->TakeWidget());
-	//	controller->SetInputMode(InputMode);
-	//	break;
-	//}
-	//case MenuType::SCOREBOARD:
-	//{
-	//	UUserWidget *gameWidget = nullptr;
-	//	gameWidget = changeUIElement(gameUIClass);
-	//	UHUDLogic* hudLogic = NewObject<UHUDLogic>();
-	//	hudLogic->SetUp(gameWidget, GetWorld());
-	//	logicClasses.Add(hudLogic);
+		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(widget->TakeWidget());
+		controller->SetInputMode(InputMode);
+		break;
+	}*/
+	case MenuType::SCOREBOARD:
+	{
+		/*UUserWidget *gameWidget = nullptr;
+		gameWidget = changeUIElement(gameUIClass);
+		UHUDLogic* hudLogic = NewObject<UHUDLogic>();
+		hudLogic->SetUp(gameWidget, GetWorld());
+		logicClasses.Add(hudLogic);
 
 
-	//	controller->bShowMouseCursor = false;
-	//	UClass *scoreboardClass = Util::LoadObjFromPath<UClass>(TEXT("'/Game/Game/UI/ScoreBoard.ScoreBoard_C'"));
-	//	UUserWidget *widget = changeUIElement(scoreboardClass);
-	//	UScoreBoard *scoreboard = NewObject<UScoreBoard>();
-	//	scoreboard->SetUp(widget, GetWorld());
-	//	logicClasses.Add(scoreboard);
-	//	break;
-	//}
-	//case MenuType::NO_UI:
-	//default:
-	//	break;
-	//}
+		controller->bShowMouseCursor = false;
+		UClass *scoreboardClass = Util::LoadObjFromPath<UClass>(TEXT("'/Game/Game/UI/ScoreBoard.ScoreBoard_C'"));
+		UUserWidget *widget = changeUIElement(scoreboardClass);
+		UScoreBoard *scoreboard = NewObject<UScoreBoard>();
+		scoreboard->SetUp(widget, GetWorld());
+		logicClasses.Add(scoreboard);*/
+		break;
+	}
+	case MenuType::NO_UI:
+	default:
+		break;
+	}
 }
 
 MenuType APlayerHUD::GetCurrentUI()
@@ -235,4 +237,21 @@ void APlayerHUD::ShowText(FString text, int32 fontsize, float anchorX, float anc
 	//message.maxTime = lifetime;
 	//screenMessages.Add(message);
 	////widgetInstance->Slot;
+}
+
+UUserWidget* APlayerHUD::changeUIElement(UClass* uitype)
+{
+	widgetInstance = CreateWidget<UUserWidget>(GetWorld(), uitype);
+	widgetInstance->AddToViewport();
+	widgets.Add(widgetInstance);
+	return widgetInstance;
+}
+
+void APlayerHUD::ClearAllWidgets()
+{
+	for (int32 i = 0; i < widgets.Num(); i++)
+	{
+		widgets[i]->RemoveFromViewport();
+	}
+	widgets.Empty();
 }

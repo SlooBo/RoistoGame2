@@ -76,7 +76,7 @@ private:
 	MenuType currentMenu;
 	UPROPERTY()
 	TArray<UUserWidget*> widgets;
-	UUserWidget* chageUIElement(UClass* uitype);
+	UUserWidget* changeUIElement(UClass* uitype);
 
 	UPROPERTY()
 	UClass* emoteWindowClass;

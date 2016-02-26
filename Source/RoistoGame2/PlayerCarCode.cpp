@@ -121,20 +121,25 @@ void APlayerCarCode::Turn(float AxisValue)
 	SetActorRotation(NewRotation);
 }
 
-void APlayerCarCode::addCheckpoint1()
+void APlayerCarCode::addCheckpoint(int checkpoint)
 {
+	switch (checkpoint)
+	{
+	case 1:
 	Checkpoint1 = true;
+		break;
+	case 2:
+		Checkpoint2 = true;
+		break;
+	case 3:
+		Checkpoint3 = true;
+		break;
+	default:
+		break;
+	}
 }
 
-void APlayerCarCode::addCheckpoint2()
-{
-	Checkpoint2 = true;
-}
 
-void APlayerCarCode::addCheckpoint3()
-{
-	Checkpoint3 = true;
-}
 
 void APlayerCarCode::addLap()
 {
