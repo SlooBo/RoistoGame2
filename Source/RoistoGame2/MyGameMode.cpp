@@ -13,20 +13,20 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(ob
 	//Defaults for game mode, use blueprints to override
 
 	//Here be the final blueprinted player class
-	/*static ConstructorHelpers::FObjectFinder<UBlueprint> APlayerCarCode(TEXT(""));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> APlayerCarCode(TEXT("Blueprint'/Game/Blueprints/Player/PlayerCar.PlayerCar'"));
 	if (APlayerCarCode.Object)
-		DefaultPawnClass = (UClass*)APlayerCarCode.Object->GeneratedClass;*/
+		DefaultPawnClass = (UClass*)APlayerCarCode.Object->GeneratedClass;
 
 	//Here be the final blueprinted Hud class
-	/*static ConstructorHelpers<UBlueprint> PlayerHud(TEXT(""));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerHud(TEXT("Blueprint'/Game/Blueprints/MyPlayerHUD.MyPlayerHUD'"));
 	if (PlayerHud.Object)
-		HUDClass = (UClass*)PlayerHud.Object->GeneratedClass;*/
+		HUDClass = (UClass*)PlayerHud.Object->GeneratedClass;
 	
-	//PlayerControllerClass = AMyPlayerController::StaticClass();
-	/*PlayerStateClass = AMyPlayerState::StaticClass();
-	SpectatorClass =
-	GhostCharacterClass =
-	GameStateClass =*/
+	PlayerControllerClass = AMyPlayerController::StaticClass();
+	PlayerStateClass = AMyPlayerState::StaticClass();
+	/*SpectatorClass =
+	GhostCharacterClass =*/
+	GameStateClass = AMyGameState::StaticClass();
 	
 	DefaultPlayerName = FText::FromString("FastCar");
 
@@ -139,12 +139,23 @@ AActor* AMyGameMode::ChoosePlayerStart_Implementation(AController* player)
 
 	if (respawnMode == RespawnMode::AtSpawnPoint)
 	{
-		//spawnLocation = GetRandoSpawnPoint(player);
-		/*if (spawnLocation == NULL)
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: No spawn points were found, add PlayerStart to level"));*/
+		spawnLocation = GetSpawnPoint(player);
+		if (spawnLocation == NULL)
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: No spawn points were found, add PlayerStart to level"));
 	}
 
 	return spawnLocation;
+}
+
+//TODO: This function need to return something else
+AActor* AMyGameMode::GetSpawnPoint(AController* player)
+{
+	TArray<APlayerStart*> spawns;
+
+	for (TActorIterator<APlayerStart> iter(GetWorld()); iter; ++iter)
+		spawns.Add(*iter);
+
+	return spawns[0];
 }
 
 void AMyGameMode::SetPlayerDefaults(APawn* playerPawn)
@@ -178,9 +189,9 @@ void AMyGameMode::RestartPlayer(AController* controller)
 		return;
 	}
 
-	//// clear respawn timers if player respawned early
-	//if (respawnTimerList.Contains(player))
-	//	GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[player]);
+	// clear respawn timers if player respawned early
+	if (respawnTimerList.Contains(player))
+		GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[player]);
 
 	if (player->PlayerState == NULL)
 	{

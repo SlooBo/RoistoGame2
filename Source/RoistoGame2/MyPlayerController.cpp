@@ -33,9 +33,9 @@ void AMyPlayerController::BeginPlay()
 	//only play music for clienst
 
 	//TODO: Add HUD here
-	/*APlayerHud *hud = Cast<APlayerHud>(GetHUD());
+	APlayerHUD *hud = Cast<APlayerHUD>(GetHUD());
 	if (hud != nullptr)
-		hud->changeUIElement(MenuType::GAME_UI);*/
+		hud->changeUIElement(MenuType::GAME_UI);
 }
 
 void AMyPlayerController::EndPlay(const EEndPlayReason::Type endPlayReason)
