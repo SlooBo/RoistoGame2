@@ -9,6 +9,8 @@ AMyPlayerState::AMyPlayerState(const FObjectInitializer& objectInitializer)
 {
 	alive = false;
 	bReplicates = true;
+	money = 0;
+	lap = 0;
 }
 
 void AMyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -38,9 +40,19 @@ int32 AMyPlayerState::GetMoney()
 	return money;
 }
 
+int32 AMyPlayerState::GetLap()
+{
+	return lap;
+}
+
 void AMyPlayerState::AddMoney(int32 num)
 {
 	SetMoney(money + num);
+}
+
+void AMyPlayerState::AddLap()
+{
+	lap++;
 }
 
 void AMyPlayerState::SetMoney(int32 num)

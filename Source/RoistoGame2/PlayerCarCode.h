@@ -53,9 +53,6 @@ protected:
 	bool Checkpoint2;
 	bool Checkpoint3;
 
-	UPROPERTY(VisibleAnywhere, Replicated, Category = "PlayerCondition")
-	int32 lap;
-
 	class UCarMovementComponent* MyMovementComponent;
 };
 

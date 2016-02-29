@@ -23,9 +23,10 @@ void UHUDLogic::SetUp(UUserWidget* widget, UWorld *world)
 	this->world = world;
 
 	//SetValueFromWidget(&raceTimeLeft, "RaceTimer");
-	SetValueFromWidget(&currentRoundText, "RoundTimer");
-	SetValueFromWidget(&currentRoundText, "Team1Points");
-	SetValueFromWidget(&currentRoundText, "Team2Points");
+	SetValueFromWidget(&raceTimeLeft, "RoundTimer");
+	SetValueFromWidget(&currentRoundText, "Round");
+	SetValueFromWidget(&team1Points, "Team1Points");
+	SetValueFromWidget(&team2Points, "Team2Points");
 	SetValueFromWidget(&cashText, "Money");
 }
 
@@ -43,8 +44,13 @@ void UHUDLogic::Update()
 
 		raceTimeLeft->SetText(text);
 
-		//currentRoundText->SetText(FText::FromString(FString::FromInt(gameState->GetTeamRaceCurrentRound() + 1)));
+		currentRoundText->SetText(FText::FromString(FString::FromInt(gameState->GetTeamRaceCurrentRound() + 1)));
 		
-	
+	}
+
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(world->GetFirstPlayerController()->PlayerState);
+	if (playerState != NULL)
+	{
+		cashText->SetText(FText::FromString(FString::FromInt(playerState->GetMoney()) + " $"));
 	}
 }
