@@ -49,6 +49,15 @@ public:
 	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get Hunt Rounds Total"), Category = "Gameplay")
 		int32 GetTeamRaceTotalRounds() { return teamRaceTotalRounds; }
 
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get team1 points"), Category = "Gameplay")
+		int32 GetTeam1Points() { return team1points; }
+
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get team1 points"), Category = "Gameplay")
+		int32 GetTeam2Points() { return team2points; }
+
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Add team points"), Category = "Gameplay")
+	void AddTeamPoints(AMyPlayerController* player, int32 amount);
+
 	// Current state of the base game mode
 	UPROPERTY(Replicated)
 		InGameState inGameState;
@@ -80,5 +89,12 @@ public:
 	// Length of current base game state
 	UPROPERTY(Replicated)
 		int32 gameTimeLength;
-	
+
+	// Team 1 points
+	UPROPERTY(Replicated)
+		int32 team1points;
+
+	// Team 2 points
+	UPROPERTY(Replicated)
+		int32 team2points;
 };

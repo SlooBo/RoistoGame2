@@ -3,12 +3,14 @@
 #include "RoistoGame2.h"
 #include "UnrealNetwork.h"
 #include "MyGameState.h"
+#include "MyPlayerState.h"
 
 
 AMyGameState::AMyGameState(const FObjectInitializer& objectInitializer)
 	:Super(objectInitializer)
 {
-
+	team1points = 0;
+	team2points = 0;
 }
 
 void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -21,6 +23,8 @@ void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AMyGameState, stateTimeLength);
 	DOREPLIFETIME(AMyGameState, gameTimeElapsed);
 	DOREPLIFETIME(AMyGameState, gameTimeLength);
+	DOREPLIFETIME(AMyGameState, team1points);
+	DOREPLIFETIME(AMyGameState, team2points);
 };
 
 int32 AMyGameState::GetStateTimeleft()
@@ -51,4 +55,27 @@ int32 AMyGameState::GetStateTimeLength()
 int32 AMyGameState::GetGameTimeLength()
 {
 	return gameTimeLength;
+}
+
+void AMyGameState::AddTeamPoints(AMyPlayerController* player, int32 amount)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(player->PlayerState);
+	if (playerState != NULL)
+	{
+		int32 team = playerState->GetTeam();
+		switch (team)
+		{
+		case 1:
+			team1points += amount;
+			break;
+		case 2:
+			team2points += amount;
+			break;
+		default:
+			break;
+		}
+
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "PlayerState is not correct in team point addition!");
 }

@@ -46,6 +46,8 @@ void UHUDLogic::Update()
 
 		currentRoundText->SetText(FText::FromString(FString::FromInt(gameState->GetTeamRaceCurrentRound() + 1)));
 		
+		team1Points->SetText(FText::FromString(FString::FromInt(gameState->GetTeam1Points())));
+		team2Points->SetText(FText::FromString(FString::FromInt(gameState->GetTeam2Points())));
 	}
 
 	AMyPlayerState* playerState = Cast<AMyPlayerState>(world->GetFirstPlayerController()->PlayerState);

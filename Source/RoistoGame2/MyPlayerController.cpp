@@ -123,12 +123,12 @@ void AMyPlayerController::OnPlayerDeathBroadcast_Implementation(AMyPlayerControl
 {
 	if (killed == this)
 	{
-		/*APlayerHud* hud = Cast<APlayerHUD>(GetHUD());
+		APlayerHUD* hud = Cast<APlayerHUD>(GetHUD());
 		if (hud != nullptr)
 		{
 			hud->ShowText("After 5 seconds press R to respawn", 32, 0.5f, 0.05f, 10, FLinearColor::Red);
 			hud->ShowText("Press B to open shop", 32, 0.5f, 0.95f, 10, FLinearColor::Red);
-		}*/
+		}
 		//handle clientside death here
 	}
 	// handle kill messages and other death related stuff here
@@ -144,6 +144,13 @@ void AMyPlayerController::OnWarmupStart_Implementation()
 
 }
 
+void AMyPlayerController::AddMoney(int32 value)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(PlayerState);
+	if (playerState != NULL)
+		playerState->AddMoney(value);
+}
+
 bool AMyPlayerController::IsAlive()
 {
 	AMyPlayerState *playerState = Cast<AMyPlayerState>(PlayerState);
@@ -154,7 +161,6 @@ bool AMyPlayerController::IsAlive()
 
 void AMyPlayerController::OpenTeamChat()
 {
-
 }
 
 void AMyPlayerController::OpenAllChat()

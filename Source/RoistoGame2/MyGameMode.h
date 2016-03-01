@@ -82,10 +82,10 @@ public:
 
 	virtual void SetupNewPlayer(APlayerController* newPlayer);
 
-	//UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Death"), Category = "Gameplay|Player")
-	//// Event when player dies or is killed by other player, called by the player
-	//void OnPlayerDeath(AMyPlayerController* player, AMyPlayerController* killer = NULL);
-	//virtual void OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer = NULL);
+	// Event when player dies or is killed by other player, called by the player
+	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Death"), Category = "Gameplay|Player")
+	void OnPlayerDeath(AMyPlayerController* player, AMyPlayerController* killer = NULL);
+	virtual void OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer = NULL);
 
 	// Event when player respawns
 	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Respawn"), Category = "Gameplay|Player")
@@ -100,6 +100,8 @@ public:
 	int32 GetPlayerMaxMoney() { return playerMaxMoney; };
 
 protected:
+
+	TSubclassOf<class ABuilderPawn> BuilderPawnClass;
 
 	TArray<APlayerController*> denyRespawnList;
 	TMap<APlayerController*, FTimerHandle> respawnTimerList;

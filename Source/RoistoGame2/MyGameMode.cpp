@@ -7,6 +7,7 @@
 #include "MyPlayerState.h"
 #include "Util.h"
 #include "MyPlayerController.h"
+#include "MySpectator.h"
 
 AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(objectInitializer)
 {
@@ -24,14 +25,16 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(ob
 	
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 	PlayerStateClass = AMyPlayerState::StaticClass();
-	/*SpectatorClass =
-	GhostCharacterClass =*/
+	SpectatorClass = AMySpectator::StaticClass();
+	BuilderPawnClass = ABuilderPawn::StaticClass();
 	GameStateClass = AMyGameState::StaticClass();
 	
 	DefaultPlayerName = FText::FromString("FastCar");
 
 	//TODO: Check true functioning behind this
 	bDelayedStart = true;
+	//TODO:Check this
+	bStartPlayersAsSpectators = false;
 
 	startTime = 0;
 	warmupTime = 0;
@@ -371,6 +374,69 @@ void AMyGameMode::SetupNewPlayer(APlayerController* newPlayer)
 		else
 			playerState->SetMoney(playerStartMoney);
 	}
+}
+
+void AMyGameMode::OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(player->PlayerState);
+	AMyPlayerState* killerState = (killer != NULL) ? Cast<AMyPlayerState>(killer->PlayerState) : NULL;
+
+	if (playerState == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: OnPlayerDeath playerState is null"));
+		return;
+	}
+
+	if (killerState != NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" killed ") + killerState->PlayerName);
+	
+		AMyGameState* gameState = Cast<AMyGameState>(GameState);
+		if (gameState != NULL)
+		{
+			gameState->AddTeamPoints(killer, 1);
+		}
+
+		//// negative frag for suicide
+		//if (killer == player)
+		//	killerState->AddFrags(-1);
+		//else
+		//	killerState->AddFrags(1);
+	}
+	else if (killer == player)
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" committed suicide"));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" died"));
+
+	//playerState->AddDeaths(1);
+	player->OnPlayerDeath();
+
+	//broadcast death for everyone
+	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
+		(*iter)->OnPlayerDeathBroadcast(player, killer);
+
+	//Turn player to builder
+	//DO
+
+	//Maybe set here warmup respawn time
+	const int32 respawnTime = playerRespawnTime;
+
+	// deny further respawn requests
+	if (playerRespawnTimeMinimum != 0)
+	{
+		denyRespawnList.AddUnique(player);
+
+		// allow manual respawning after minimum period of time
+		if (playerRespawnTimeMinimum < respawnTime)
+		{
+			FTimerHandle timerHandle;
+			FTimerDelegate allowDelegate = FTimerDelegate::CreateUObject<AMyGameMode, APlayerController*>(this, &AMyGameMode::AllowPlayerRespawn, player);
+			GetWorld()->GetTimerManager().SetTimer(timerHandle, allowDelegate, playerRespawnTimeMinimum, false);
+		}
+	}
+
+	RespawnPlayer(player, respawnTime);
+
 }
 
 //TODO: this
