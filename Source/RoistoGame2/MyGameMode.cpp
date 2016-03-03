@@ -19,7 +19,7 @@ AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(ob
 		DefaultPawnClass = (UClass*)APlayerCarCode.Object->GeneratedClass;
 
 	//Here be the final blueprinted Hud class
-	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerHud(TEXT("Blueprint'/Game/Blueprints/MyPlayerHUD.MyPlayerHUD'"));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerHud(TEXT("Blueprint'/Game/UI/MyPlayerHUD.MyPlayerHUD'"));
 	if (PlayerHud.Object)
 		HUDClass = (UClass*)PlayerHud.Object->GeneratedClass;
 	
@@ -352,6 +352,64 @@ void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
 	//From different project;Might not be needed in this game
 	//FTimerDelegate respawnDelegate = FTimerDelegate::CreateUObject<ACMGameMode, AController*>(this, &ACMGameMode::RestartPlayer, player);
 	//GetWorld()->GetTimerManager().SetTimer(respawnTimerList[player], respawnDelegate, respawnDelay, false);
+}
+
+void AMyGameMode::SpectatePlayer(APlayerController* player)
+{
+	if (Cast<ABuilderPawn>(player->GetPawn()) != NULL)
+	{
+		//reset builder location if player fell out of level
+		//should be impossible but just in case
+		AActor* spawnActor = GetSpawnPoint(player);
+		if (spawnActor != NULL)
+			Cast<ABuilderPawn>(player->GetPawn())->SetActorLocation(spawnActor->GetActorLocation());
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: Could not move Ghost Character"));
+		return;
+	}
+
+	// disable player pawn instead of destroying it, and let player character destroy itself
+	// this fixes some movement related bugs between server and client right after death occured
+	if (player->GetPawn() != NULL)
+	{
+		player->GetPawn()->SetActorHiddenInGame(true);
+		player->GetPawn()->SetActorEnableCollision(false);
+		player->GetPawn()->SetActorTickEnabled(false);
+	}
+
+	// set player to spectator while waiting to respawn
+	if (respawnMode == RespawnMode::AtSpawnPoint)
+	{
+		player->PlayerState->bIsSpectator = true;
+		player->ChangeState(NAME_Spectating);
+		player->ClientGotoState(NAME_Spectating);
+	}
+	else
+	{
+		AActor* spawnActor = player->GetPawn();
+		if (player->GetPawn() == NULL || respawnMode == RespawnMode::AtBuilderNearSpawn)
+			spawnActor = GetSpawnPoint(player);
+		if(spawnActor == NULL)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: No spawn points were found, add PlayerStart to level"));
+			return;
+		}
+
+		FVector position = spawnActor->GetActorLocation();
+		FRotator rotation = spawnActor->GetActorRotation();
+		FRotator newControlRot = rotation;
+		if (Cast<APlayerCarCode>(spawnActor) != NULL)
+			newControlRot.Pitch = Cast<APlayerCarCode>(spawnActor)->GetControlRotation().Pitch;
+		
+		rotation.Roll = 0.0f;
+
+		player->UnPossess();
+		APawn* pawn = GetWorld()->SpawnActor<APawn>(BuilderPawnClass, position, rotation);
+		player->Possess(pawn);
+
+		if (pawn == NULL)
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: Could not spawn builderpawn, overlapping with another actor?"));
+	}
 }
 
 void AMyGameMode::OnMatchStart_Implementation()

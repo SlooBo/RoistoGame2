@@ -12,8 +12,11 @@ UCLASS()
 class ROISTOGAME2_API AMySpectator : public ASpectatorPawn
 {
 	GENERATED_BODY()
+public:
+	AMySpectator(const FObjectInitializer& ObjectInitializer);
 	
-	
-	
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+
+	void TryRespawn();
 	
 };

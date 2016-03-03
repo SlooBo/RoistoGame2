@@ -74,6 +74,8 @@ public:
 	UFUNCTION(BlueprintCallable, Meta = (Displayname = "Respawn Player"), Category = "Gameplay|Player")
 	void RespawnPlayer(APlayerController* player, float respawnDelay = 0.0f);
 
+	void SpectatePlayer(APlayerController* player);
+
 	//Event when match has started
 	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Match Start"), Category = "Gameplay")
 	void OnMatchStart();

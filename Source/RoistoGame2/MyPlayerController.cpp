@@ -5,6 +5,7 @@
 #include "MyPlayerController.h"
 #include "MyPlayerState.h"
 #include "PlayerCarCode.h"
+#include "BuilderPawn.h"
 #include "PlayerHUD.h"
 #include "MyGameMode.h"
 
@@ -86,30 +87,30 @@ void AMyPlayerController::Possess(APawn* inPawn)
 		return;
 
 	APlayerCarCode* pc = Cast<APlayerCarCode>(inPawn);
-	//ABuildChar* builder = Cast<>(inPawn);
-	if (pc != NULL /*&& builder == NULL*/)
+	ABuilderPawn* builder = Cast<ABuilderPawn>(inPawn);
+	if (pc != NULL && builder == NULL)
 	{
 		//handle APlayerCarCode possession here
 	}
-	//else if (builder != NULL)
-	//{
-	//	//handle builder character possession here
-	//}
+	else if (builder != NULL)
+	{
+		//handle builder character possession here
+	}
 
 }
 
 void AMyPlayerController::UnPossess()
 {
 	APlayerCarCode* pc = Cast<APlayerCarCode>(GetPawn());
-	//ABuildChar* builder = Cast<>(GetPawn());
-	if (pc != NULL /*&& builder == NULL*/)
+	ABuilderPawn* builder = Cast<ABuilderPawn>(GetPawn());
+	if (pc != NULL && builder == NULL)
 	{
 		//handle APlayerCarCode unpossession here
 	}
-	//else if (builder != NULL)
-	//{
-	//	//handle builder character unpossession here
-	//}
+	else if (builder != NULL)
+	{
+		//handle builder character unpossession here
+	}
 
 	Super::UnPossess();
 }
