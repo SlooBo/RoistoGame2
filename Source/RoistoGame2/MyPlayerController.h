@@ -46,6 +46,9 @@ public:
 	UFUNCTION(Reliable, Client)
 	void OnWarmupStart();
 
+	UFUNCTION(Exec)
+	void AddMoney(int32 value);
+
 	bool IsAlive();
 	
 protected:

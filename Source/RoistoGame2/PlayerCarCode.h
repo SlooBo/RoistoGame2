@@ -41,12 +41,8 @@ public:
 	UStaticMeshComponent* WheelMesh;
 
 	//const UBoxComponent* getHitBox();
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint1"), Category = "Gameplay | Player")
-	void addCheckpoint1();
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint2"), Category = "Gameplay | Player")
-	void addCheckpoint2();
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint3"), Category = "Gameplay | Player")
-	void addCheckpoint3();
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Reached checkpoint"), Category = "Gameplay | Player")
+	void addCheckpoint(int32 checkpoint);
 	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Survived lap"), Category = "Gameplay|Player")
 	void addLap();
 
@@ -56,9 +52,6 @@ protected:
 	bool Checkpoint1;
 	bool Checkpoint2;
 	bool Checkpoint3;
-
-	UPROPERTY(VisibleAnywhere, Replicated, Category = "PlayerCondition")
-	int32 lap;
 
 	class UCarMovementComponent* MyMovementComponent;
 };

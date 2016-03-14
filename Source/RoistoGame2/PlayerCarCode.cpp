@@ -53,7 +53,6 @@ APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer
 	Checkpoint2 = false;
 	Checkpoint3 = false;
 
-	lap = 0;
 }
 
 // Called when the game starts or when spawned
@@ -90,7 +89,6 @@ void APlayerCarCode::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	// Value is already updated locally, skip in replication step
 	//DOREPLIFETIME_CONDITION(APlayerCharacter, value, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(APlayerCarCode, lap, COND_SkipOwner);
 
 	//Replicated to every client, no special condition required
 	//DOREPLIFETIME(APlayerCharacter, value);
@@ -121,27 +119,31 @@ void APlayerCarCode::Turn(float AxisValue)
 	SetActorRotation(NewRotation);
 }
 
-void APlayerCarCode::addCheckpoint1()
+void APlayerCarCode::addCheckpoint(int checkpoint)
 {
+	switch (checkpoint)
+	{
+	case 1:
 	Checkpoint1 = true;
+		break;
+	case 2:
+		Checkpoint2 = true;
+		break;
+	case 3:
+		Checkpoint3 = true;
+		break;
+	default:
+		break;
+	}
 }
 
-void APlayerCarCode::addCheckpoint2()
-{
-	Checkpoint2 = true;
-}
 
-void APlayerCarCode::addCheckpoint3()
-{
-	Checkpoint3 = true;
-}
 
 void APlayerCarCode::addLap()
 {
 	if (Checkpoint1 && Checkpoint2 && Checkpoint3)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, " Survived lap !!!");
-		lap++;
 		Checkpoint1 = false;
 		Checkpoint2 = false;
 		Checkpoint3 = false;
@@ -151,6 +153,7 @@ void APlayerCarCode::addLap()
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Major error during lap finish!");
 			return;
 		}
+		playerState->AddLap();
 		//TODO:Adjust this
 		playerState->AddMoney(500);
 	}

@@ -50,6 +50,7 @@ public:
 
 	virtual bool ShouldSpawnAtStartSpot(AController* player) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* player) override;
+	virtual AActor* GetSpawnPoint(AController* player);
 	virtual void SetPlayerDefaults(APawn* playerPawn) override;
 	virtual void RestartPlayer(AController* controller) override;
 
@@ -73,6 +74,8 @@ public:
 	UFUNCTION(BlueprintCallable, Meta = (Displayname = "Respawn Player"), Category = "Gameplay|Player")
 	void RespawnPlayer(APlayerController* player, float respawnDelay = 0.0f);
 
+	void SpectatePlayer(APlayerController* player);
+
 	//Event when match has started
 	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Match Start"), Category = "Gameplay")
 	void OnMatchStart();
@@ -81,10 +84,10 @@ public:
 
 	virtual void SetupNewPlayer(APlayerController* newPlayer);
 
-	//UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Death"), Category = "Gameplay|Player")
-	//// Event when player dies or is killed by other player, called by the player
-	//void OnPlayerDeath(AMyPlayerController* player, AMyPlayerController* killer = NULL);
-	//virtual void OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer = NULL);
+	// Event when player dies or is killed by other player, called by the player
+	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Death"), Category = "Gameplay|Player")
+	void OnPlayerDeath(AMyPlayerController* player, AMyPlayerController* killer = NULL);
+	virtual void OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer = NULL);
 
 	// Event when player respawns
 	UFUNCTION(BlueprintNativeEvent, Meta = (DisplayName = "On Player Respawn"), Category = "Gameplay|Player")
@@ -99,6 +102,8 @@ public:
 	int32 GetPlayerMaxMoney() { return playerMaxMoney; };
 
 protected:
+
+	TSubclassOf<class ABuilderPawn> BuilderPawnClass;
 
 	TArray<APlayerController*> denyRespawnList;
 	TMap<APlayerController*, FTimerHandle> respawnTimerList;

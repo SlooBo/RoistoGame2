@@ -25,4 +25,8 @@ protected:
 
 	UTextBlock *raceTimeLeft;
 	UTextBlock *currentRoundText;
+	UTextBlock* team1Points;
+	UTextBlock* team2Points;
+
+	UTextBlock *cashText;
 };

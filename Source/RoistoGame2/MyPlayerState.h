@@ -42,16 +42,20 @@ public:
 	/* Ca$h                                                                 */
 	/************************************************************************/
 
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get Money"), Category = "Gameplay|Hunt")
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get Money"), Category = "Gameplay")
 	int32 GetMoney();
 
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Add Money"), Category = "Gameplay|Hunt")
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Get Lap"), Category = "Gameplay")
+	int32 GetLap();
+
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Add Money"), Category = "Gameplay")
 	void AddMoney(int32 num);
 
-	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Set Money"), Category = "Gameplay|Hunt", Exec)
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Set Money"), Category = "Gameplay", Exec)
 	void SetMoney(int32 num);
 
-
+	UFUNCTION(BlueprintCallable, Meta = (DisplayName = "Add lap"), Category = "Gameplay")
+	void AddLap();
 	
 protected:
 
@@ -66,5 +70,8 @@ protected:
 	// Player Money
 	UPROPERTY(Replicated, Meta = (DisplayName = "Player Money", ClampMin = "0"))
 	int32 money;
+
+	UPROPERTY(VisibleAnywhere, Replicated, Meta = (DisplayName = "Player laps", ClampMin = "0"))
+	int32 lap;
 	
 };

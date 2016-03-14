@@ -17,7 +17,7 @@ ABuilderPawn::ABuilderPawn(const FObjectInitializer& ObjectInitializer)
 
 	//TODO: Box collision presets
 	MyHitBox->SetCollisionProfileName(TEXT("Pawn"));
-	/* Don't collide with camera checks to keep 3rd person camera at position when other players are standing behind player */
+	/* Don't collide with camera checks to keep 3rd person camera at position when other players between pawn and camera */
 	MyHitBox->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 
@@ -26,7 +26,7 @@ ABuilderPawn::ABuilderPawn(const FObjectInitializer& ObjectInitializer)
 	SpringArm->AttachTo(RootComponent);
 	SpringArm->RelativeRotation = FRotator(-90.f, 0.f, 0.f);
 	SpringArm->TargetArmLength = 1000.0f;
-	SpringArm->bEnableCameraLag = true;
+	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 2.0f;
 
 	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -39,13 +39,14 @@ void ABuilderPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+
 }
 
 // Called every frame
 void ABuilderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input

@@ -5,6 +5,7 @@
 #include "MyPlayerController.h"
 #include "MyPlayerState.h"
 #include "PlayerCarCode.h"
+#include "BuilderPawn.h"
 #include "PlayerHUD.h"
 #include "MyGameMode.h"
 
@@ -33,9 +34,9 @@ void AMyPlayerController::BeginPlay()
 	//only play music for clienst
 
 	//TODO: Add HUD here
-	/*APlayerHud *hud = Cast<APlayerHud>(GetHUD());
+	APlayerHUD *hud = Cast<APlayerHUD>(GetHUD());
 	if (hud != nullptr)
-		hud->changeUIElement(MenuType::GAME_UI);*/
+		hud->changeUIElement(MenuType::GAME_UI);
 }
 
 void AMyPlayerController::EndPlay(const EEndPlayReason::Type endPlayReason)
@@ -86,30 +87,30 @@ void AMyPlayerController::Possess(APawn* inPawn)
 		return;
 
 	APlayerCarCode* pc = Cast<APlayerCarCode>(inPawn);
-	//ABuildChar* builder = Cast<>(inPawn);
-	if (pc != NULL /*&& builder == NULL*/)
+	ABuilderPawn* builder = Cast<ABuilderPawn>(inPawn);
+	if (pc != NULL && builder == NULL)
 	{
 		//handle APlayerCarCode possession here
 	}
-	//else if (builder != NULL)
-	//{
-	//	//handle builder character possession here
-	//}
+	else if (builder != NULL)
+	{
+		//handle builder character possession here
+	}
 
 }
 
 void AMyPlayerController::UnPossess()
 {
 	APlayerCarCode* pc = Cast<APlayerCarCode>(GetPawn());
-	//ABuildChar* builder = Cast<>(GetPawn());
-	if (pc != NULL /*&& builder == NULL*/)
+	ABuilderPawn* builder = Cast<ABuilderPawn>(GetPawn());
+	if (pc != NULL && builder == NULL)
 	{
 		//handle APlayerCarCode unpossession here
 	}
-	//else if (builder != NULL)
-	//{
-	//	//handle builder character unpossession here
-	//}
+	else if (builder != NULL)
+	{
+		//handle builder character unpossession here
+	}
 
 	Super::UnPossess();
 }
@@ -123,12 +124,12 @@ void AMyPlayerController::OnPlayerDeathBroadcast_Implementation(AMyPlayerControl
 {
 	if (killed == this)
 	{
-		/*APlayerHud* hud = Cast<APlayerHUD>(GetHUD());
+		APlayerHUD* hud = Cast<APlayerHUD>(GetHUD());
 		if (hud != nullptr)
 		{
 			hud->ShowText("After 5 seconds press R to respawn", 32, 0.5f, 0.05f, 10, FLinearColor::Red);
 			hud->ShowText("Press B to open shop", 32, 0.5f, 0.95f, 10, FLinearColor::Red);
-		}*/
+		}
 		//handle clientside death here
 	}
 	// handle kill messages and other death related stuff here
@@ -144,6 +145,13 @@ void AMyPlayerController::OnWarmupStart_Implementation()
 
 }
 
+void AMyPlayerController::AddMoney(int32 value)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(PlayerState);
+	if (playerState != NULL)
+		playerState->AddMoney(value);
+}
+
 bool AMyPlayerController::IsAlive()
 {
 	AMyPlayerState *playerState = Cast<AMyPlayerState>(PlayerState);
@@ -154,7 +162,6 @@ bool AMyPlayerController::IsAlive()
 
 void AMyPlayerController::OpenTeamChat()
 {
-
 }
 
 void AMyPlayerController::OpenAllChat()

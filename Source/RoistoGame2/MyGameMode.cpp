@@ -7,31 +7,34 @@
 #include "MyPlayerState.h"
 #include "Util.h"
 #include "MyPlayerController.h"
+#include "MySpectator.h"
 
 AMyGameMode::AMyGameMode(const FObjectInitializer& objectInitializer) : Super(objectInitializer)
 {
 	//Defaults for game mode, use blueprints to override
 
 	//Here be the final blueprinted player class
-	/*static ConstructorHelpers::FObjectFinder<UBlueprint> APlayerCarCode(TEXT(""));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> APlayerCarCode(TEXT("Blueprint'/Game/Blueprints/Player/PlayerCar.PlayerCar'"));
 	if (APlayerCarCode.Object)
-		DefaultPawnClass = (UClass*)APlayerCarCode.Object->GeneratedClass;*/
+		DefaultPawnClass = (UClass*)APlayerCarCode.Object->GeneratedClass;
 
 	//Here be the final blueprinted Hud class
-	/*static ConstructorHelpers<UBlueprint> PlayerHud(TEXT(""));
+	static ConstructorHelpers::FObjectFinder<UBlueprint> PlayerHud(TEXT("Blueprint'/Game/UI/MyPlayerHUD.MyPlayerHUD'"));
 	if (PlayerHud.Object)
-		HUDClass = (UClass*)PlayerHud.Object->GeneratedClass;*/
+		HUDClass = (UClass*)PlayerHud.Object->GeneratedClass;
 	
-	//PlayerControllerClass = AMyPlayerController::StaticClass();
-	/*PlayerStateClass = AMyPlayerState::StaticClass();
-	SpectatorClass =
-	GhostCharacterClass =
-	GameStateClass =*/
+	PlayerControllerClass = AMyPlayerController::StaticClass();
+	PlayerStateClass = AMyPlayerState::StaticClass();
+	SpectatorClass = AMySpectator::StaticClass();
+	BuilderPawnClass = ABuilderPawn::StaticClass();
+	GameStateClass = AMyGameState::StaticClass();
 	
 	DefaultPlayerName = FText::FromString("FastCar");
 
 	//TODO: Check true functioning behind this
 	bDelayedStart = true;
+	//TODO:Check this
+	bStartPlayersAsSpectators = false;
 
 	startTime = 0;
 	warmupTime = 0;
@@ -139,12 +142,23 @@ AActor* AMyGameMode::ChoosePlayerStart_Implementation(AController* player)
 
 	if (respawnMode == RespawnMode::AtSpawnPoint)
 	{
-		//spawnLocation = GetRandoSpawnPoint(player);
-		/*if (spawnLocation == NULL)
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: No spawn points were found, add PlayerStart to level"));*/
+		spawnLocation = GetSpawnPoint(player);
+		if (spawnLocation == NULL)
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: No spawn points were found, add PlayerStart to level"));
 	}
 
 	return spawnLocation;
+}
+
+//TODO: This function need to return something else
+AActor* AMyGameMode::GetSpawnPoint(AController* player)
+{
+	TArray<APlayerStart*> spawns;
+
+	for (TActorIterator<APlayerStart> iter(GetWorld()); iter; ++iter)
+		spawns.Add(*iter);
+
+	return spawns[0];
 }
 
 void AMyGameMode::SetPlayerDefaults(APawn* playerPawn)
@@ -178,9 +192,9 @@ void AMyGameMode::RestartPlayer(AController* controller)
 		return;
 	}
 
-	//// clear respawn timers if player respawned early
-	//if (respawnTimerList.Contains(player))
-	//	GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[player]);
+	// clear respawn timers if player respawned early
+	if (respawnTimerList.Contains(player))
+		GetWorld()->GetTimerManager().ClearTimer(respawnTimerList[player]);
 
 	if (player->PlayerState == NULL)
 	{
@@ -340,6 +354,64 @@ void AMyGameMode::RespawnPlayer(APlayerController* player, float respawnDelay)
 	//GetWorld()->GetTimerManager().SetTimer(respawnTimerList[player], respawnDelegate, respawnDelay, false);
 }
 
+void AMyGameMode::SpectatePlayer(APlayerController* player)
+{
+	if (Cast<ABuilderPawn>(player->GetPawn()) != NULL)
+	{
+		//reset builder location if player fell out of level
+		//should be impossible but just in case
+		AActor* spawnActor = GetSpawnPoint(player);
+		if (spawnActor != NULL)
+			Cast<ABuilderPawn>(player->GetPawn())->SetActorLocation(spawnActor->GetActorLocation());
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: Could not move Ghost Character"));
+		return;
+	}
+
+	// disable player pawn instead of destroying it, and let player character destroy itself
+	// this fixes some movement related bugs between server and client right after death occured
+	if (player->GetPawn() != NULL)
+	{
+		player->GetPawn()->SetActorHiddenInGame(true);
+		player->GetPawn()->SetActorEnableCollision(false);
+		player->GetPawn()->SetActorTickEnabled(false);
+	}
+
+	// set player to spectator while waiting to respawn
+	if (respawnMode == RespawnMode::AtSpawnPoint)
+	{
+		player->PlayerState->bIsSpectator = true;
+		player->ChangeState(NAME_Spectating);
+		player->ClientGotoState(NAME_Spectating);
+	}
+	else
+	{
+		AActor* spawnActor = player->GetPawn();
+		if (player->GetPawn() == NULL || respawnMode == RespawnMode::AtBuilderNearSpawn)
+			spawnActor = GetSpawnPoint(player);
+		if(spawnActor == NULL)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: No spawn points were found, add PlayerStart to level"));
+			return;
+		}
+
+		FVector position = spawnActor->GetActorLocation();
+		FRotator rotation = spawnActor->GetActorRotation();
+		FRotator newControlRot = rotation;
+		if (Cast<APlayerCarCode>(spawnActor) != NULL)
+			newControlRot.Pitch = Cast<APlayerCarCode>(spawnActor)->GetControlRotation().Pitch;
+		
+		rotation.Roll = 0.0f;
+
+		player->UnPossess();
+		APawn* pawn = GetWorld()->SpawnActor<APawn>(BuilderPawnClass, position, rotation);
+		player->Possess(pawn);
+
+		if (pawn == NULL)
+			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: Could not spawn builderpawn, overlapping with another actor?"));
+	}
+}
+
 void AMyGameMode::OnMatchStart_Implementation()
 {
 	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
@@ -360,6 +432,69 @@ void AMyGameMode::SetupNewPlayer(APlayerController* newPlayer)
 		else
 			playerState->SetMoney(playerStartMoney);
 	}
+}
+
+void AMyGameMode::OnPlayerDeath_Implementation(AMyPlayerController* player, AMyPlayerController* killer)
+{
+	AMyPlayerState* playerState = Cast<AMyPlayerState>(player->PlayerState);
+	AMyPlayerState* killerState = (killer != NULL) ? Cast<AMyPlayerState>(killer->PlayerState) : NULL;
+
+	if (playerState == NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Error: OnPlayerDeath playerState is null"));
+		return;
+	}
+
+	if (killerState != NULL)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" killed ") + killerState->PlayerName);
+	
+		AMyGameState* gameState = Cast<AMyGameState>(GameState);
+		if (gameState != NULL)
+		{
+			gameState->AddTeamPoints(killer, 1);
+		}
+
+		//// negative frag for suicide
+		//if (killer == player)
+		//	killerState->AddFrags(-1);
+		//else
+		//	killerState->AddFrags(1);
+	}
+	else if (killer == player)
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" committed suicide"));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, playerState->PlayerName + TEXT(" died"));
+
+	//playerState->AddDeaths(1);
+	player->OnPlayerDeath();
+
+	//broadcast death for everyone
+	for (TActorIterator<AMyPlayerController> iter(GetWorld()); iter; ++iter)
+		(*iter)->OnPlayerDeathBroadcast(player, killer);
+
+	//Turn player to builder
+	//DO
+
+	//Maybe set here warmup respawn time
+	const int32 respawnTime = playerRespawnTime;
+
+	// deny further respawn requests
+	if (playerRespawnTimeMinimum != 0)
+	{
+		denyRespawnList.AddUnique(player);
+
+		// allow manual respawning after minimum period of time
+		if (playerRespawnTimeMinimum < respawnTime)
+		{
+			FTimerHandle timerHandle;
+			FTimerDelegate allowDelegate = FTimerDelegate::CreateUObject<AMyGameMode, APlayerController*>(this, &AMyGameMode::AllowPlayerRespawn, player);
+			GetWorld()->GetTimerManager().SetTimer(timerHandle, allowDelegate, playerRespawnTimeMinimum, false);
+		}
+	}
+
+	RespawnPlayer(player, respawnTime);
+
 }
 
 //TODO: this
