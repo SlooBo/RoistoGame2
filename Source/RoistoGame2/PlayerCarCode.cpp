@@ -37,8 +37,8 @@ APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer
 	//TODO: Adjust values
 	SpringArm->AttachTo(RootComponent);
 	SpringArm->RelativeRotation = FRotator(-20.f, 0.f, 0.f);
-	SpringArm->TargetArmLength = 250.0f;
-	SpringArm->bEnableCameraLag = true;
+	SpringArm->TargetArmLength = 650.0f;
+	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 2.0f;
 
 	UCameraComponent* Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -109,6 +109,7 @@ void APlayerCarCode::MoveForward(float AxisValue)
 	if (MyMovementComponent && (MyMovementComponent->UpdatedComponent == RootComponent))
 	{
 		MyMovementComponent->AddInputVector(GetActorForwardVector() * AxisValue);
+		//TODO:Old value
 	}
 }
 

@@ -23,5 +23,5 @@ void AMySpectator::TryRespawn()
 {
 	AMyPlayerController* playerController = Cast<AMyPlayerController>(GetController());
 	if (playerController != NULL)
-r		playerController->RequestRespawn();
+		playerController->RequestRespawn();
 }
