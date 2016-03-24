@@ -23,11 +23,12 @@ APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer
 	CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarMesh"));
 	CarMesh->AttachTo(RootComponent);
 	UStaticMesh* meshToUse = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),
-		NULL, TEXT("StaticMesh'/Game/Models/Bullets/nuclearBomb.nuclearBomb'")));
+		NULL, TEXT("StaticMesh'/Game/Models/Cars/Template/CAR_Template_Hull.CAR_Template_Hull'")));
 	if (CarMesh && meshToUse)
 	{
 		CarMesh->SetStaticMesh(meshToUse);
 	}
+	//TODO: Fix rotation
 	//TODO: Find a proper way to set mesh
 
 

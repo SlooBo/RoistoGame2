@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RoistoGame2.h"
+#include "UnrealNetwork.h"
 #include "BasePawn.h"
 
 
@@ -9,6 +10,9 @@ ABasePawn::ABasePawn()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	health_Max = 100;
+	health = health_Max;
 	
 }
 
@@ -31,6 +35,12 @@ void ABasePawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
+}
+
+void ABasePawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ABasePawn, health);
 }
 
 void ABasePawn::FellOutOfWorld(const class UDamageType& DmgType)
@@ -65,4 +75,22 @@ void ABasePawn::DelayedDestroy(FTimerHandle& timerHandle)
 		GetWorld()->GetTimerManager().ClearTimer(timerHandle);
 		Destroy(true);
 	}
+}
+
+float ABasePawn::GetHealth() const
+{
+	return health;
+}
+
+float ABasePawn::GetHealthMax() const
+{
+	return health_Max;
+}
+
+void ABasePawn::AddHealth(float _health)
+{
+	if (health + _health >= health_Max)
+		health = health_Max;
+	else
+		health = health + _health;
 }

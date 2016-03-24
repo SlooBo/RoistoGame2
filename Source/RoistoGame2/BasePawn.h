@@ -28,7 +28,19 @@ public:
 
 	void DelayedDestroy();
 
+	UFUNCTION(BlueprintCallable, Category = "PlayerCondition")
+		float GetHealth() const;
+	UFUNCTION(BlueprintCallable, Category = "PlayerCondition")
+		float GetHealthMax() const;
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerCondition")
+	void AddHealth(float _health);
+
 protected:
+	UPROPERTY(VisibleAnywhere, Replicated, Category = "PlayerCondition")
+		float health;
+	UPROPERTY(VisibleAnywhere, Category = "PlayerCondition")
+		float health_Max;
 
 
 	UFUNCTION(Reliable, NetMulticast)
