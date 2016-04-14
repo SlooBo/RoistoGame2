@@ -21,6 +21,7 @@ APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer
 	MyHitBox->SetCollisionProfileName(TEXT("Pawn"));
 	//Dont set mesh in code
 	CarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CarMesh"));
+
 	CarMesh->AttachTo(RootComponent);
 	UStaticMesh* meshToUse = Cast<UStaticMesh>(StaticLoadObject(UStaticMesh::StaticClass(),
 		NULL, TEXT("StaticMesh'/Game/Models/Cars/Template/CAR_Template_Hull.CAR_Template_Hull'")));
@@ -29,6 +30,9 @@ APlayerCarCode::APlayerCarCode(const class FObjectInitializer& ObjectInitializer
 		CarMesh->SetStaticMesh(meshToUse);
 	}
 	//TODO: Fix rotation
+	CarMesh->SetWorldLocationAndRotation(FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 90.0f, 0.0f));
+	/*CarMesh->SetRelativeRotation(FQuat(FRotator(90.0f, 0.0f, 0.0f)));
+	CarMesh->AddLocalRotation(FQuat(FRotator(90.0f, 0.0f, 0.0f)));*/
 	//TODO: Find a proper way to set mesh
 
 

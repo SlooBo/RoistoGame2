@@ -29,9 +29,39 @@ public:
 	UFUNCTION()
 	void AddSessionToGUI(int32 searchIndex);
 private:
+	TArray<FOnlineSessionSearchResult, FDefaultAllocator> searchResults;
 	UPROPERTY()
 	bool searchingSessions;
-	
+	UPROPERTY()
+	UWorld *world;
+	UPROPERTY()
+	UButton *createSessionButton;
+	UPROPERTY()
+	UButton *findSessionsButton;
+	UPROPERTY()
+	UButton *addSessionButton;
+	UPROPERTY()
+	UButton *connectButton;
+	UPROPERTY()
+	UScrollBox *serverListScrollBox;
+	UPROPERTY()
+	UEditableTextBox *ipTextBox;
+	UButton *hostGameButton;
+	UFUNCTION()
+	void ConnectSessionWithIP();
+	UFUNCTION()
+	void HostGame();
+	TSharedPtr<FOnlineSessionSearch> SearchSettings;
+	UFUNCTION()
+	void OnFindSessionsComplete(bool bWasSuccessful);
+	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
+	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
+
+	FOnFindSessionsComplete& OnFindSessionsComplete() { return FindSessionsCompleteEvent; }
+	FOnFindSessionsComplete FindSessionsCompleteEvent;
+	UPROPERTY()
+	TArray<class UServerInfo*> buttonServerInfos;
+
 };
 
 UCLASS()
