@@ -20,7 +20,7 @@ void UServerBrowserLogic::SetUp(UUserWidget* widget, UWorld* world)
 	this->baseWidget = widget;
 	//this->world = world;
 
-	/*SetValueFromWidget(&createSessionButton, "CreateSession");
+	SetValueFromWidget(&createSessionButton, "CreateSession");
 	createSessionButton->AddDynamic(this, &UServerBrowserLogic::CreateSession);
 	SetValueFromWidget(&findSessionsButton, "FindSessionsButton");
 	findSessionsButton->OnClicked.AddDynamic(this, &UServerBrowserLogic::FindSessions);
@@ -34,7 +34,7 @@ void UServerBrowserLogic::SetUp(UUserWidget* widget, UWorld* world)
 
 	SetValueFromWidget(&hostGameButton, "HostButton");
 	hostGameButton->OnClicked.AddDynamic(this, &UServerBrowserLogic::HostGame);
-	*/
+	
 	
 
 }
