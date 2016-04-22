@@ -4,6 +4,7 @@
 #include "PlayerHUD.h"
 #include "HUDLogic.h"
 #include "MainMenuLogic.h"
+#include "ServerBrowserLogic.h"
 #include "MyPlayerController.h"
 #include "PlayerCarCode.h"
 
@@ -21,13 +22,13 @@ APlayerHUD::APlayerHUD(const FObjectInitializer& PCIP) : Super()
 		gameUIClass = (UClass*)GameUIBP.Object;
 	}
 
-	/*
-	static ConstructorHelpers::FObjectFinder<UClass> ServerBrowserBP(TEXT("'/Game/Game/UI/ServerBrowserGUI.ServerBrowserGUI_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> ServerBrowserBP(TEXT("WidgetBlueprint'/Game/UI/ServerBrowserGUI.ServerBrowserGUI'"));
 	if (ServerBrowserBP.Object)
 	{
 		serverBrowserClass = (UClass*)ServerBrowserBP.Object;
 	}
 
+	/*
 	static ConstructorHelpers::FObjectFinder<UClass> ShopBP(TEXT("'/Game/Game/UI/ShopGUI.ShopGUI_C'"));
 	if (ShopBP.Object)
 	{
@@ -103,11 +104,11 @@ void APlayerHUD::changeUIElement(MenuType menu)
 	{
 		UUserWidget* widget = changeUIElement(mainMenuClass);
 
-		//UMainMenuLogic* mainMenuLogic = NewObject<UMainMenuLogic>();
-		//mainMenuLogic->SetUp(widget, GetWorld());
-		//logicClasses.Add(mainMenuLogic);
+		UMainMenuLogic* mainMenuLogic = NewObject<UMainMenuLogic>();
+		mainMenuLogic->SetUp(widget, GetWorld());
+		logicClasses.Add(mainMenuLogic);
 
-		////this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		//this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 		break;
 	}
 	case MenuType::GAME_UI:
@@ -128,12 +129,12 @@ void APlayerHUD::changeUIElement(MenuType menu)
 	}
 	case MenuType::SERVER_BROWSER:
 	{
-		/*controller->bShowMouseCursor = true;
+		controller->bShowMouseCursor = true;
 		UUserWidget* widget;
 		widget = changeUIElement(serverBrowserClass);
 		UServerBrowserLogic* serverBrowser = NewObject<UServerBrowserLogic>();
 		serverBrowser->SetUp(widget, GetWorld());
-		logicClasses.Add(serverBrowser);*/
+		logicClasses.Add(serverBrowser);
 		break;
 	}
 	//case MenuType::SHOP:
