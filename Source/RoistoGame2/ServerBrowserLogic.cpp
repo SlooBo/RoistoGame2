@@ -6,8 +6,8 @@
 
 UServerBrowserLogic::UServerBrowserLogic() :Super()
 {
-	/*OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UServerBrowserLogic::OnFindSessionsComplete);
-	searchingSessions = false;*/
+	OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UServerBrowserLogic::OnFindSessionsComplete);
+	searchingSessions = false;
 }
 
 UServerBrowserLogic::~UServerBrowserLogic()
@@ -20,11 +20,11 @@ void UServerBrowserLogic::SetUp(UUserWidget* widget, UWorld* world)
 	this->baseWidget = widget;
 	//this->world = world;
 
+
 	SetValueFromWidget(&createSessionButton, "CreateSession");
 	createSessionButton->AddDynamic(this, &UServerBrowserLogic::CreateSession);
 	SetValueFromWidget(&findSessionsButton, "FindSessionsButton");
 	findSessionsButton->OnClicked.AddDynamic(this, &UServerBrowserLogic::FindSessions);
-
 
 
 	SetValueFromWidget(&connectButton, "ConnectButton");
