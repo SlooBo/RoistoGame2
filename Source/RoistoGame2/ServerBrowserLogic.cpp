@@ -22,7 +22,7 @@ void UServerBrowserLogic::SetUp(UUserWidget* widget, UWorld* world)
 
 
 	SetValueFromWidget(&createSessionButton, "CreateSession");
-	createSessionButton->AddDynamic(this, &UServerBrowserLogic::CreateSession);
+	createSessionButton->OnClicked.AddDynamic(this, &UServerBrowserLogic::CreateSession);
 	SetValueFromWidget(&findSessionsButton, "FindSessionsButton");
 	findSessionsButton->OnClicked.AddDynamic(this, &UServerBrowserLogic::FindSessions);
 

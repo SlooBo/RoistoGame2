@@ -22,7 +22,7 @@ APlayerHUD::APlayerHUD(const FObjectInitializer& PCIP) : Super()
 		gameUIClass = (UClass*)GameUIBP.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UClass> ServerBrowserBP(TEXT("WidgetBlueprint'/Game/UI/ServerBrowserGUI.ServerBrowserGUI'"));
+	static ConstructorHelpers::FObjectFinder<UClass> ServerBrowserBP(TEXT("'/Game/UI/ServerBrowserGUI.ServerBrowserGUI_C'"));
 	if (ServerBrowserBP.Object)
 	{
 		serverBrowserClass = (UClass*)ServerBrowserBP.Object;
@@ -43,7 +43,7 @@ APlayerHUD::APlayerHUD(const FObjectInitializer& PCIP) : Super()
 
 void APlayerHUD::BeginPlayCpluplus()
 {
-	//changeUIElement(MenuType::MAIN_MENU);
+	changeUIElement(MenuType::MAIN_MENU);
 	//call function setup chat from chatwindow
 
 }
@@ -108,13 +108,13 @@ void APlayerHUD::changeUIElement(MenuType menu)
 		mainMenuLogic->SetUp(widget, GetWorld());
 		logicClasses.Add(mainMenuLogic);
 
-		//this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+		this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 		break;
 	}
 	case MenuType::GAME_UI:
 	{
 		controller->bShowMouseCursor = false;
-		//this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+		this->GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		UUserWidget* widget;
 
 		widget = changeUIElement(gameUIClass);
